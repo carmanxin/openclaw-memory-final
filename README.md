@@ -40,12 +40,20 @@ bash scripts/setup.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
 
 Then:
 1. Merge `examples/AGENTS-memory-section.md` into your `~/.openclaw/workspace/AGENTS.md`
-2. Merge `examples/openclaw-memory-config.json` into `~/.openclaw/openclaw.json`
+2. Merge `examples/openclaw-memory-config.patch.json` into `~/.openclaw/openclaw.json`
 3. Restart gateway
 
 ```bash
 openclaw gateway restart
 ```
+
+
+## Safe Deployment Notes
+
+- `scripts/setup.sh` only manages `memory-*` cron jobs and state files.
+- Existing memory jobs are kept by default. Use `--force-recreate` only when you really need replacement.
+- Avoid full `config.apply` with snippets. Use `config.patch` semantics for memory config.
+- If gateway behaves abnormally after deployment, follow [`docs/troubleshooting-gateway.md`](docs/troubleshooting-gateway.md).
 
 ## Repository Layout
 

@@ -37,12 +37,20 @@ bash scripts/setup.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
 完成安装后，请继续：
 
 1. 合并 `examples/AGENTS-memory-section.md` 到 `~/.openclaw/workspace/AGENTS.md`
-2. 合并 `examples/openclaw-memory-config.json` 到 `~/.openclaw/openclaw.json`
+2. （可选）按 patch 方式应用 `examples/openclaw-memory-config.patch.json`，不要整文件覆盖配置
 3. 重启 gateway：
 
 ```bash
 openclaw gateway restart
 ```
+
+
+## 安全部署说明
+
+- `scripts/setup.sh` 只管理 `memory-*` 三个 cron 和状态文件。
+- 默认保留已存在任务；仅在必要时使用 `--force-recreate` 覆盖。
+- 请勿把配置片段直接做全量 `config.apply`；应使用 patch 语义。
+- 若部署后 gateway 异常，按 [`docs/troubleshooting-gateway.md`](docs/troubleshooting-gateway.md) 排查。
 
 ## 仓库结构
 
