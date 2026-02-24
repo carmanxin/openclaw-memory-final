@@ -4,6 +4,8 @@
 
 > 本仓库沉淀了我们在线上使用的记忆方案：**日增量蒸馏 + 周度精炼归档 + watchdog 稳定性守护 + QMD 检索索引**。
 
+**AI 直链可部署：**可以。仅给仓库链接时，建议直接使用 [`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md) 这份标准提示词完成确定性落地。
+
 ## 亮点
 
 - **分层记忆流水线**：`daily sync + weekly tidy + watchdog`
@@ -29,7 +31,7 @@
 ## 快速开始
 
 ```bash
-bash scripts/setup.sh --tz Asia/Shanghai
+bash scripts/setup.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
 ```
 
 完成安装后，请继续：

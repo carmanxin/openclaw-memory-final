@@ -4,6 +4,8 @@ Production-grade, open-source memory architecture for OpenClaw.
 
 [中文文档 / Chinese Docs](README.zh-CN.md)
 
+**AI-ready:** Yes. If a user only sends this repo link, use [`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md) for deterministic one-link bootstrap.
+
 > This repository packages a practical memory system we run in production: incremental daily distillation, weekly consolidation, watchdog-based reliability, and QMD indexing.
 
 **Short description:** A practical OpenClaw memory framework with daily sync, weekly tidy, and watchdog reliability.
@@ -33,7 +35,7 @@ See full design: [`docs/architecture.md`](docs/architecture.md)
 ## Quick Start
 
 ```bash
-bash scripts/setup.sh --tz Asia/Shanghai
+bash scripts/setup.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
 ```
 
 Then:
