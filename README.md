@@ -24,6 +24,25 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 
 See deterministic prompt: [`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md)
 
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+  S[Sessions] --> A[memory-sync-daily]
+  A --> B[processed-sessions.json]
+  B --> C[memory/YYYY-MM-DD.md]
+  C --> D[memory-weekly-tidy]
+  D --> E[MEMORY.md + weekly + archive]
+  C --> F[qmd update]
+  D --> G[qmd update + embed]
+  H[memory-cron-watchdog] --> I[health checks + last3]
+  I --> J{2 consecutive anomalies?}
+  J -- no --> K[no alert]
+  J -- yes --> L[alert (optional)]
+```
+
+Detailed view: [`docs/architecture.md`](docs/architecture.md)
+
 ## Highlights
 
 - **Layered memory pipeline**: daily sync + weekly tidy + watchdog

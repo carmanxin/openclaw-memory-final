@@ -20,6 +20,25 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 
 标准提示词见：[`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md)
 
+## 架构图
+
+```mermaid
+flowchart LR
+  S[会话输入] --> A[memory-sync-daily]
+  A --> B[processed-sessions.json]
+  B --> C[memory/YYYY-MM-DD.md]
+  C --> D[memory-weekly-tidy]
+  D --> E[MEMORY.md + weekly + archive]
+  C --> F[qmd update]
+  D --> G[qmd update + embed]
+  H[memory-cron-watchdog] --> I[健康检查 + last3]
+  I --> J{连续2次异常?}
+  J -- 否 --> K[不告警]
+  J -- 是 --> L[告警(可选)]
+```
+
+详版见：[`docs/architecture.md`](docs/architecture.md)
+
 ## 亮点
 
 - **分层记忆流水线**：`daily sync + weekly tidy + watchdog`
