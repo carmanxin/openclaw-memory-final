@@ -10,6 +10,20 @@ Production-grade, open-source memory architecture for OpenClaw.
 
 **Short description:** A practical OpenClaw memory framework with daily sync, weekly tidy, and watchdog reliability.
 
+## AI-first Install (Recommended)
+
+For agent-driven deployment, use one command:
+
+```bash
+bash scripts/install-ai.sh --tz Asia/Shanghai
+```
+
+- Success marker: `AI_INSTALL_OK`
+- Failure marker: `AI_INSTALL_ERROR <reason>`
+- On success, it prints a JSON report (jobs, ids, next runs, qmd path, state files).
+
+See deterministic prompt: [`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md)
+
 ## Highlights
 
 - **Layered memory pipeline**: daily sync + weekly tidy + watchdog
@@ -35,7 +49,7 @@ See full design: [`docs/architecture.md`](docs/architecture.md)
 ## Quick Start
 
 ```bash
-bash scripts/setup.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
+bash scripts/install-ai.sh --tz Asia/Shanghai
 ```
 
 Then:

@@ -10,6 +10,7 @@ OPS_TARGET="${OPS_TARGET:-}"
 FORCE_RECREATE=0
 CMD_TIMEOUT_SEC="${OPENCLAW_CMD_TIMEOUT_SEC:-25}"
 SKIP_HEALTHCHECK=0
+PRINT_JSON=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -31,6 +32,8 @@ while [[ $# -gt 0 ]]; do
       CMD_TIMEOUT_SEC="$2"; shift 2 ;;
     --skip-healthcheck)
       SKIP_HEALTHCHECK=1; shift ;;
+    --print-json)
+      PRINT_JSON=1; shift ;;
     *)
       echo "Unknown argument: $1" >&2
       exit 1 ;;
@@ -143,15 +146,15 @@ ensure_job() {
 
   if job_exists "$name"; then
     if [[ "$FORCE_RECREATE" -eq 1 ]]; then
-      echo "recreate existing job: $name"
+      [[ "$PRINT_JSON" -eq 0 ]] && echo "recreate existing job: $name"
       remove_jobs_by_name "$name"
     else
-      echo "keep existing job: $name (use --force-recreate to replace)"
+      [[ "$PRINT_JSON" -eq 0 ]] && echo "keep existing job: $name (use --force-recreate to replace)"
       return 0
     fi
   fi
 
-  run_oc cron add "$@"
+  run_oc cron add "$@" >/dev/null
 }
 
 ensure_job "memory-sync-daily" \
@@ -162,7 +165,7 @@ ensure_job "memory-sync-daily" \
   --agent main \
   --timeout-seconds 300 \
   --no-deliver \
-  --message "$DAILY_MSG" >/dev/null
+  --message "$DAILY_MSG"
 
 ensure_job "memory-weekly-tidy" \
   --name "memory-weekly-tidy" \
@@ -172,7 +175,7 @@ ensure_job "memory-weekly-tidy" \
   --agent main \
   --timeout-seconds 600 \
   --no-deliver \
-  --message "$WEEKLY_MSG" >/dev/null
+  --message "$WEEKLY_MSG"
 
 ensure_job "memory-cron-watchdog" \
   --name "memory-cron-watchdog" \
@@ -182,7 +185,7 @@ ensure_job "memory-cron-watchdog" \
   --agent main \
   --timeout-seconds 180 \
   --no-deliver \
-  --message "$WATCHDOG_MSG" >/dev/null
+  --message "$WATCHDOG_MSG"
 
 if [[ "$SKIP_HEALTHCHECK" -eq 0 ]]; then
   if ! run_oc status >/dev/null 2>&1; then
@@ -190,6 +193,51 @@ if [[ "$SKIP_HEALTHCHECK" -eq 0 ]]; then
     echo "建议: openclaw gateway restart && openclaw doctor --non-interactive" >&2
     exit 2
   fi
+fi
+
+JOBS_JSON="$(list_jobs_json)"
+if [[ "$PRINT_JSON" -eq 1 ]]; then
+  python3 - "$TZ_VALUE" "$WORKSPACE" "$QMD_PATH" "$OPS_CHANNEL" "$OPS_ACCOUNT" "$OPS_TARGET" <<'PY' <<<"$JOBS_JSON"
+import json, sys, os
+
+tz, workspace, qmd, ops_channel, ops_account, ops_target = sys.argv[1:]
+raw = sys.stdin.read().strip() or '{"jobs":[]}'
+try:
+    data = json.loads(raw)
+except Exception:
+    data = {"jobs": []}
+want = {"memory-sync-daily", "memory-weekly-tidy", "memory-cron-watchdog"}
+installed = []
+for job in data.get("jobs", []):
+    if job.get("name") in want:
+        state = job.get("state", {})
+        installed.append({
+            "name": job.get("name"),
+            "id": job.get("id"),
+            "enabled": job.get("enabled"),
+            "nextRunAtMs": state.get("nextRunAtMs"),
+            "lastStatus": state.get("lastStatus")
+        })
+
+result = {
+    "ok": len(installed) == 3,
+    "timezone": tz,
+    "workspace": workspace,
+    "qmdPath": qmd,
+    "watchdogTarget": {
+        "channel": ops_channel,
+        "accountId": ops_account,
+        "target": ops_target if ops_target else None
+    },
+    "stateFiles": {
+        "processedSessions": os.path.isfile(os.path.join(workspace, "memory/state/processed-sessions.json")),
+        "watchdogState": os.path.isfile(os.path.join(workspace, "memory/state/memory-watchdog-state.json"))
+    },
+    "jobs": sorted(installed, key=lambda x: x["name"])
+}
+print(json.dumps(result, ensure_ascii=False))
+PY
+  exit 0
 fi
 
 echo "✅ Installed memory architecture jobs"

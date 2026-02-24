@@ -1,39 +1,36 @@
 # AI Agent Bootstrap Prompt (One-Link Friendly)
 
-Paste this prompt to OpenClaw together with this repository URL.
+Paste this prompt to OpenClaw with the repository URL.
 
 ```text
-请基于仓库 https://github.com/codesfly/openclaw-memory-final 在当前机器完成“可运行”的记忆架构部署，并输出验收结果。
+请在当前机器按“可审计、可回滚”的方式部署：
+https://github.com/codesfly/openclaw-memory-final
 
-目标：
-- 成功部署 3 个 cron：memory-sync-daily / memory-weekly-tidy / memory-cron-watchdog
-- 初始化 memory/state 两个状态文件
-- 输出可审计结果（任务ID、时区、QMD路径、下次运行时间）
-
-执行要求：
+严格按以下步骤执行：
 1) clone 仓库到临时目录
-2) 自动探测 qmd 路径（command -v qmd）；若失败，明确报错并停止
-3) 执行：
-   bash scripts/setup.sh --tz Asia/Shanghai --qmd-path <探测到的路径>
-   （如我提供了告警群，再追加 --ops-channel/--ops-account/--ops-target）
-4) 不覆盖我的业务 cron（仅操作 memory-* 三个任务）
-5) 结束前执行验证：
-   - openclaw cron list（确认三项存在）
-   - 检查 memory/state/processed-sessions.json
-   - 检查 memory/state/memory-watchdog-state.json
-6) 最终按以下格式回报：
-   - Installed: [jobName -> jobId]
-   - QMD Path:
+2) 执行（单命令安装，AI 友好）：
+   bash scripts/install-ai.sh --tz Asia/Shanghai
+3) 若返回 `AI_INSTALL_ERROR qmd_not_found`，则停止并提示我提供 qmd 绝对路径
+4) 若成功，必须输出 install-ai.sh 返回的 JSON 原文
+5) 再执行一次核验：
+   - openclaw cron list（确认存在 memory-sync-daily / memory-weekly-tidy / memory-cron-watchdog）
+   - 检查 `~/.openclaw/workspace/memory/state/processed-sessions.json`
+   - 检查 `~/.openclaw/workspace/memory/state/memory-watchdog-state.json`
+6) 最终回报格式：
+   - Result: OK/FAIL
+   - Jobs: 名称 -> id
    - Next Runs:
-   - State Files:
+   - QMD Path:
    - Warnings:
 
-注意：
-- 不做任何外发消息，除非我明确提供告警 target。
-- 不要修改非 memory 相关任务。
+约束：
+- 不修改任何非 memory-* 任务
+- 不执行外发消息（除非我明确提供 ops target）
+- 不做全量 config.apply 覆盖
 ```
 
-## Notes
+## Why this is AI-friendly
 
-- This prompt is deterministic and tool-oriented.
-- It avoids hidden assumptions by requiring explicit verification output.
+- Single command (`install-ai.sh`) for deterministic install
+- Structured success/error markers (`AI_INSTALL_OK` / `AI_INSTALL_ERROR`)
+- Machine-readable JSON output for automated verification

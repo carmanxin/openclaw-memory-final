@@ -4,9 +4,10 @@ set -euo pipefail
 # shell syntax
 bash -n scripts/setup.sh
 bash -n scripts/uninstall.sh
+bash -n scripts/install-ai.sh
 
 # json validity
-jq empty examples/openclaw-memory-config.json
+jq empty examples/openclaw-memory-config.patch.json
 jq empty examples/memory/state/processed-sessions.json
 jq empty examples/memory/state/memory-watchdog-state.json
 
