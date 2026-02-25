@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-02-25
+
+### Added
+- `scripts/install-skills-pack.sh` for one-command installation of the AI-friendly workspace skills bundle.
+- JSON-style success output (`SKILLS_INSTALL_OK`) for deterministic agent automation.
+
+### Changed
+- README (EN/ZH) now recommends one-command skills installation.
+- `docs/ai-agent-prompt.md` now prefers installer script and falls back to manual extraction.
+
 ## [0.2.1] - 2026-02-25
 
 ### Added

@@ -15,6 +15,14 @@ This folder contains custom OpenClaw skills used by this memory architecture wor
 
 - `openclaw-skills-pack-v2026-02-25.tar.gz`
 
+## Install (recommended)
+
+From repo root:
+
+```bash
+bash scripts/install-skills-pack.sh
+```
+
 ## Install (manual)
 
 1. Extract skills into your workspace skills directory:

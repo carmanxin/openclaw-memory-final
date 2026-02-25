@@ -87,7 +87,15 @@ openclaw gateway restart
 
 ## Optional: Install AI-friendly workspace skills pack
 
-If you want deterministic behavior for memory/cron/release workflows, install the bundled skills from [`examples/skills/`](examples/skills/):
+If you want deterministic behavior for memory/cron/release workflows, install the bundled skills from [`examples/skills/`](examples/skills/).
+
+### One-command installer (recommended)
+
+```bash
+bash scripts/install-skills-pack.sh
+```
+
+### Manual install
 
 ```bash
 mkdir -p ~/.openclaw/workspace/skills

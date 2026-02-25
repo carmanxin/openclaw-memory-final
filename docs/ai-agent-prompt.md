@@ -33,7 +33,8 @@ https://github.com/codesfly/openclaw-memory-final
 - 子 agent 原始执行过程保留在会话历史；长期记忆仅沉淀 task card 结论
 
 可选增强（AI 友好）：
-- 若仓库存在 `examples/skills/openclaw-skills-pack-*.tar.gz`，将其解压到 `<workspace>/skills`。
+- 优先执行 `bash scripts/install-skills-pack.sh` 安装 skills 包。
+- 若脚本不可用，再回退为手动解压 `examples/skills/openclaw-skills-pack-*.tar.gz` 到 `<workspace>/skills`。
 - 执行 `openclaw skills list --eligible` 验证技能可见。
 - 提醒用户：skills 在新会话生效（session snapshot）。
 ```

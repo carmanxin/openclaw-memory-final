@@ -90,7 +90,15 @@ openclaw gateway restart
 
 ## 可选：安装 AI 友好的 workspace skills 包
 
-如果你希望在“记忆沉淀 / cron 诊断 / 发布流程”上获得更稳定的一致行为，可安装 [`examples/skills/`](examples/skills/) 中的技能包：
+如果你希望在“记忆沉淀 / cron 诊断 / 发布流程”上获得更稳定的一致行为，可安装 [`examples/skills/`](examples/skills/) 中的技能包。
+
+### 一键安装（推荐）
+
+```bash
+bash scripts/install-skills-pack.sh
+```
+
+### 手动安装
 
 ```bash
 mkdir -p ~/.openclaw/workspace/skills
