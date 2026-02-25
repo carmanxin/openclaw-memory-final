@@ -27,7 +27,10 @@ flowchart LR
   S["会话输入"] --> A["每日同步任务"]
   A --> B["去重状态 processed sessions"]
   B --> C["当日日志 memory YYYY MM DD"]
+  A --> T["任务索引 memory tasks"]
+  T --> R["检索优先读任务卡"]
   C --> D["每周精炼任务"]
+  T --> D
   D --> E["长期记忆 周摘要 归档"]
   C --> F["qmd update"]
   D --> G["qmd update and embed"]
@@ -42,6 +45,7 @@ flowchart LR
 ## 亮点
 
 - **分层记忆流水线**：`daily sync + weekly tidy + watchdog`
+- **子 agent 任务索引层**：结果卡沉淀到 `memory/tasks/`
 - **幂等写入**：基于消息指纹游标（`processed-sessions.json`）
 - **低噪告警**：同类异常需连续 2 次才告警
 - **成本可控**：日常仅 `qmd update`，周任务执行 `qmd update && qmd embed`
@@ -52,6 +56,7 @@ flowchart LR
 1. **Daily Sync**（`memory-sync-daily`，本地时间 23:00）
    - 仅处理最近 26 小时内的新增有效会话
    - 结构化追加到 `memory/YYYY-MM-DD.md`
+   - 子 agent 任务仅沉淀结果卡到 `memory/tasks/YYYY-MM-DD.md`
 2. **Weekly Tidy**（`memory-weekly-tidy`，每周日 22:00）
    - 精炼并裁剪 `MEMORY.md`
    - 生成周摘要并归档过期 daily 日志
@@ -60,6 +65,12 @@ flowchart LR
    - 仅在异常重复出现时告警
 
 完整设计见：[`docs/architecture.md`](docs/architecture.md)
+
+## 检索顺序（建议）
+
+1. 先读 `memory/tasks/*.md`（任务结果）
+2. 再做语义记忆检索
+3. 最后按需下钻子 agent 原始会话
 
 ## 快速开始
 

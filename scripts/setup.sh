@@ -78,7 +78,7 @@ fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-mkdir -p "$WORKSPACE/memory/weekly" "$WORKSPACE/memory/archive/$(date +%Y)" "$WORKSPACE/memory/state"
+mkdir -p "$WORKSPACE/memory/weekly" "$WORKSPACE/memory/archive/$(date +%Y)" "$WORKSPACE/memory/state" "$WORKSPACE/memory/tasks"
 
 if [[ ! -f "$WORKSPACE/memory/state/processed-sessions.json" ]]; then
   cp "$REPO_ROOT/examples/memory/state/processed-sessions.json" "$WORKSPACE/memory/state/processed-sessions.json"
@@ -128,7 +128,7 @@ job_exists() {
   [[ -n "$ids" ]]
 }
 
-DAILY_MSG="MEMORY DAILY SYNC — 你是每日记忆蒸馏 agent。读取最近26小时会话，跳过<2条用户消息和isolated噪音会话。使用最后用户消息timestamp+文本前120字符作为fingerprint；若与memory/state/processed-sessions.json中lastFingerprint一致则跳过。仅将新增会话摘要追加到memory/YYYY-MM-DD.md（3-8条要点）。更新state后执行 QMD_GPU=cpu $QMD_PATH update。完成回复ANNOUNCE_SKIP。"
+DAILY_MSG="MEMORY DAILY SYNC — 你是每日记忆蒸馏 agent。读取最近26小时会话，跳过<2条用户消息和isolated噪音会话。使用最后用户消息timestamp+文本前120字符作为fingerprint；若与memory/state/processed-sessions.json中lastFingerprint一致则跳过。仅将新增会话摘要追加到memory/YYYY-MM-DD.md（3-8条要点）。若存在子agent任务，只将结果卡（目标/边界/验收/关键动作/产物路径/最终状态/下一步）写入memory/tasks/YYYY-MM-DD.md，不写全过程日志。更新state后执行 QMD_GPU=cpu $QMD_PATH update。完成回复ANNOUNCE_SKIP。"
 
 WEEKLY_MSG="MEMORY WEEKLY TIDY — 你是每周记忆巩固 agent。聚合近7天daily日志，精炼MEMORY.md（<=80行/5KB），生成memory/weekly/YYYY-MM-DD.md并归档覆盖的旧daily。执行 QMD_GPU=cpu $QMD_PATH update && QMD_GPU=cpu $QMD_PATH embed。无变更回复ANNOUNCE_SKIP。"
 
@@ -231,7 +231,8 @@ result = {
     },
     "stateFiles": {
         "processedSessions": os.path.isfile(os.path.join(workspace, "memory/state/processed-sessions.json")),
-        "watchdogState": os.path.isfile(os.path.join(workspace, "memory/state/memory-watchdog-state.json"))
+        "watchdogState": os.path.isfile(os.path.join(workspace, "memory/state/memory-watchdog-state.json")),
+        "taskMemoryDir": os.path.isdir(os.path.join(workspace, "memory/tasks"))
     },
     "jobs": sorted(installed, key=lambda x: x["name"])
 }

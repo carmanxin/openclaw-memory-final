@@ -21,6 +21,18 @@ You wake up fresh each session. Files are your memory.
 - Recommended hard cap: 80 lines / 5KB
 - Compress/merge before adding if near cap
 
+### Sub-agent task memory (result-only)
+
+- Keep sub-agent raw process in isolated session history.
+- Persist only reusable outcomes into `memory/tasks/YYYY-MM-DD.md`.
+- Suggested fields: goal, boundary, acceptance, key actions, artifact paths, final status, next step.
+
+### Retrieval order
+
+1. Check `memory/tasks/*.md` first
+2. Then run semantic memory search
+3. Drill into raw session history only when needed
+
 ### Write-now rule
 
 When key decisions or durable user preferences appear, append to today's daily memory immediately.

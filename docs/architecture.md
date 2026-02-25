@@ -7,9 +7,12 @@ flowchart TD
   U["User sessions direct group"] --> DS["Daily sync 23 00"]
   DS --> F["Fingerprint idempotency state"]
   F --> DLOG["Daily memory log append only"]
+  DS --> TIDX["Task memory index by day"]
+  TIDX --> RET["retrieve task cards first"]
   DLOG --> Q1["QMD update daily"]
 
   DLOG --> WT["Weekly tidy Sun 22 00"]
+  TIDX --> WT
   WT --> LM["Long term memory file"]
   WT --> WS["Weekly summary file"]
   WT --> AR["Archive old daily logs"]
@@ -31,6 +34,12 @@ flowchart TD
 - Auditability: every decision and status can be traced
 
 ## 2) Pipeline
+
+### Task Memory Index (for sub-agents)
+- Sub-agent raw execution history stays in isolated session history for auditability.
+- Main session writes result-oriented task cards to `memory/tasks/YYYY-MM-DD.md`.
+- Retrieval order should be: task cards first, then semantic memory search, then raw session drill-down.
+- This preserves traceability while avoiding high-token replay of noisy execution logs.
 
 ### A. Daily Sync (`memory-sync-daily`)
 - Schedule: `0 23 * * *` (local timezone)
@@ -58,6 +67,8 @@ flowchart TD
   - stores per-session last fingerprint and timestamps
 - `memory/state/memory-watchdog-state.json`
   - stores anomaly counters and `last3` snapshots
+- `memory/tasks/YYYY-MM-DD.md`
+  - stores result-only task cards for sub-agent jobs (goal/boundary/acceptance/actions/artifacts/status/next)
 
 ## 4) QMD strategy
 
@@ -71,4 +82,5 @@ This keeps retrieval fresh while reducing embedding cost.
 - Daily sync runs once per day (instead of high-frequency re-summarization).
 - Weekly tidy batches heavy consolidation and embedding.
 - Fingerprint idempotency prevents duplicate memory writes.
+- Task cards capture sub-agent outcomes without replaying full execution traces.
 - Watchdog suppresses noisy one-off anomalies (2-hit confirmation).

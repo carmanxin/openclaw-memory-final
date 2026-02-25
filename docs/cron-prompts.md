@@ -8,6 +8,8 @@ This repository ships prompt templates through `scripts/setup.sh`.
 - Filter low-signal sessions
 - Compute message fingerprint
 - Append concise memory block to today's file
+- For sub-agent tasks, write result-only task card to `memory/tasks/YYYY-MM-DD.md`
+- Skip noisy isolated raw logs in long-term layers
 - Update cursor state
 - Run `qmd update`
 

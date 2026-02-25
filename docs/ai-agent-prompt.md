@@ -16,7 +16,10 @@ https://github.com/codesfly/openclaw-memory-final
    - openclaw cron list（确认存在 memory-sync-daily / memory-weekly-tidy / memory-cron-watchdog）
    - 检查 `~/.openclaw/workspace/memory/state/processed-sessions.json`
    - 检查 `~/.openclaw/workspace/memory/state/memory-watchdog-state.json`
-6) 最终回报格式：
+6) 若存在子 agent 任务，补充生成结果卡：`~/.openclaw/workspace/memory/tasks/YYYY-MM-DD.md`
+   - 仅写结论，不粘贴完整执行日志
+   - 字段至少包含：任务目标、边界、验收、关键动作、产物路径、最终状态、下一步
+7) 最终回报格式：
    - Result: OK/FAIL
    - Jobs: 名称 -> id
    - Next Runs:
@@ -27,6 +30,7 @@ https://github.com/codesfly/openclaw-memory-final
 - 不修改任何非 memory-* 任务
 - 不执行外发消息（除非我明确提供 ops target）
 - 不做全量 config.apply 覆盖
+- 子 agent 原始执行过程保留在会话历史；长期记忆仅沉淀 task card 结论
 ```
 
 ## Why this is AI-friendly

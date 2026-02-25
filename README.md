@@ -31,7 +31,10 @@ flowchart LR
   S["Sessions"] --> A["memory sync daily"]
   A --> B["processed sessions state"]
   B --> C["daily memory log"]
+  A --> T["task memory index"]
+  T --> R["task-first retrieval"]
   C --> D["memory weekly tidy"]
+  T --> D
   D --> E["long term memory weekly archive"]
   C --> F["qmd update"]
   D --> G["qmd update and embed"]
@@ -46,6 +49,7 @@ Detailed view: [`docs/architecture.md`](docs/architecture.md)
 ## Highlights
 
 - **Layered memory pipeline**: daily sync + weekly tidy + watchdog
+- **Sub-agent task memory index**: result-only task cards in `memory/tasks/`
 - **Idempotent capture**: message fingerprint cursor (`processed-sessions.json`)
 - **Low-noise alerting**: alert only after **2 consecutive anomalies**
 - **Cost-aware indexing**: daily `qmd update`, weekly `qmd update && qmd embed`
@@ -56,6 +60,7 @@ Detailed view: [`docs/architecture.md`](docs/architecture.md)
 1. **Daily Sync** (`memory-sync-daily`, 23:00 local time)
    - Distill only new conversations from the last 26h
    - Append structured notes to `memory/YYYY-MM-DD.md`
+   - Write sub-agent result cards to `memory/tasks/YYYY-MM-DD.md`
 2. **Weekly Tidy** (`memory-weekly-tidy`, Sunday 22:00)
    - Consolidate and prune `MEMORY.md`
    - Generate weekly summary and archive old daily logs
@@ -87,6 +92,12 @@ openclaw gateway restart
 - Existing memory jobs are kept by default. Use `--force-recreate` only when you really need replacement.
 - Avoid full `config.apply` with snippets. Use `config.patch` semantics for memory config.
 - If gateway behaves abnormally after deployment, follow [`docs/troubleshooting-gateway.md`](docs/troubleshooting-gateway.md).
+
+## Retrieval Order (recommended)
+
+1. Check `memory/tasks/*.md` for task outcomes
+2. Then use semantic memory search
+3. Drill into raw sub-agent session history only when necessary
 
 ## Repository Layout
 
