@@ -31,32 +31,49 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 
 ```mermaid
 flowchart LR
-  S["会话输入"] --> M["主会话"]
-  S --> SA["子agent会话（隔离）"]
+  U["Users & Channels<br/>用户与多渠道会话"] --> M["Main Session / 主会话协调器"]
+  U --> SA["Sub-agent Sessions / 子Agent隔离会话"]
 
-  M --> CS["CURRENT_STATE 短期工作台"]
-  M --> C["当日日志 memory YYYY MM DD"]
+  subgraph L1["Capture & Handoff / 采集与交接层"]
+    CS["CURRENT_STATE.md<br/>Short-term Workspace / 短期工作台"]
+    DL["memory/YYYY-MM-DD.md<br/>Daily Log (append-only) / 日志只追加"]
+    TI["memory/tasks/YYYY-MM-DD.md<br/>Task Cards / 结果卡"]
+    SH["Isolated Session History / 隔离原始轨迹"]
+  end
 
-  SA --> SH["原始过程保留在隔离历史"]
-  SA --> T["任务索引 memory tasks"]
-  M --> T
+  M --> CS
+  M --> DL
+  M --> TI
+  SA --> SH
+  SA --> TI
 
-  C --> A["每日同步任务"]
-  T --> A
-  A --> B["去重状态 processed sessions"]
-  C --> D["每周精炼任务"]
-  T --> D
+  subgraph L2["Consolidation / 提炼层"]
+    DS["memory-sync-daily<br/>Daily Distillation / 日蒸馏"]
+    WT["memory-weekly-tidy<br/>Weekly Consolidation / 周精炼"]
+    PS["processed-sessions.json<br/>Idempotency Cursor / 幂等游标"]
+    LM["MEMORY.md + weekly summary + archive<br/>长期记忆 / 周报 / 归档"]
+  end
 
-  T --> R["检索优先读任务卡"]
-  R --> RS["语义记忆检索"]
+  DL --> DS
+  TI --> DS
+  DS --> PS
+  DL --> WT
+  TI --> WT
+  WT --> LM
 
-  D --> E["长期记忆 周摘要 归档"]
-  C --> F["qmd update"]
-  D --> G["qmd update and embed"]
-  H["watchdog"] --> I["健康检查 与 最近三次快照"]
-  I --> J{"连续异常次数 >= 2"}
-  J -- 否 --> K["不告警"]
-  J -- 是 --> L["发送可选告警"]
+  subgraph L3["Retrieval & Reliability / 检索与可靠性层"]
+    R1["Task-first Retrieval / 先查任务卡"]
+    R2["Semantic Search / 语义检索"]
+    Q1["QMD update (daily)"]
+    Q2["QMD update + embed (weekly)"]
+    WD["memory-cron-watchdog<br/>2-hit anomaly confirmation / 连续2次异常确认"]
+  end
+
+  TI --> R1 --> R2
+  DS --> Q1
+  WT --> Q2
+  WD --> DS
+  WD --> WT
 ```
 
 详版见：[`docs/architecture.md`](docs/architecture.md)

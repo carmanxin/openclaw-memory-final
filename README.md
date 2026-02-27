@@ -35,32 +35,49 @@ See deterministic prompt: [`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md)
 
 ```mermaid
 flowchart LR
-  S["Sessions"] --> M["Main session"]
-  S --> SA["Sub-agent sessions isolated"]
+  U["Users & Channels<br/>用户与多渠道会话"] --> M["Main Session / 主会话协调器"]
+  U --> SA["Sub-agent Sessions / 子Agent隔离会话"]
 
-  M --> CS["CURRENT_STATE short-term workspace"]
-  M --> C["daily memory log"]
+  subgraph L1["Capture & Handoff / 采集与交接层"]
+    CS["CURRENT_STATE.md<br/>Short-term Workspace / 短期工作台"]
+    DL["memory/YYYY-MM-DD.md<br/>Daily Log (append-only) / 日志只追加"]
+    TI["memory/tasks/YYYY-MM-DD.md<br/>Task Cards / 结果卡"]
+    SH["Isolated Session History / 隔离原始轨迹"]
+  end
 
-  SA --> SH["raw traces in isolated history"]
-  SA --> T["task memory index"]
-  M --> T
+  M --> CS
+  M --> DL
+  M --> TI
+  SA --> SH
+  SA --> TI
 
-  C --> A["memory sync daily"]
-  T --> A
-  A --> B["processed sessions state"]
-  C --> D["memory weekly tidy"]
-  T --> D
+  subgraph L2["Consolidation / 提炼层"]
+    DS["memory-sync-daily<br/>Daily Distillation / 日蒸馏"]
+    WT["memory-weekly-tidy<br/>Weekly Consolidation / 周精炼"]
+    PS["processed-sessions.json<br/>Idempotency Cursor / 幂等游标"]
+    LM["MEMORY.md + weekly summary + archive<br/>长期记忆 / 周报 / 归档"]
+  end
 
-  T --> R["task-first retrieval"]
-  R --> RS["semantic memory search"]
+  DL --> DS
+  TI --> DS
+  DS --> PS
+  DL --> WT
+  TI --> WT
+  WT --> LM
 
-  D --> E["long term memory weekly archive"]
-  C --> F["qmd update"]
-  D --> G["qmd update and embed"]
-  H["memory cron watchdog"] --> I["health checks and last3 snapshots"]
-  I --> J{"anomaly count >= 2"}
-  J -- No --> K["skip alert"]
-  J -- Yes --> L["send optional alert"]
+  subgraph L3["Retrieval & Reliability / 检索与可靠性层"]
+    R1["Task-first Retrieval / 先查任务卡"]
+    R2["Semantic Search / 语义检索"]
+    Q1["QMD update (daily)"]
+    Q2["QMD update + embed (weekly)"]
+    WD["memory-cron-watchdog<br/>2-hit anomaly confirmation / 连续2次异常确认"]
+  end
+
+  TI --> R1 --> R2
+  DS --> Q1
+  WT --> Q2
+  WD --> DS
+  WD --> WT
 ```
 
 Detailed view: [`docs/architecture.md`](docs/architecture.md)

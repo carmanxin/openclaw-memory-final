@@ -3,37 +3,50 @@
 ## 0) System Diagram
 
 ```mermaid
-flowchart TD
-  U["User sessions"] --> M["Main session"]
-  U --> SA["Sub-agent sessions isolated"]
+flowchart LR
+  U["Users & Channels<br/>用户与多渠道会话"] --> M["Main Session / 主会话协调器"]
+  U --> SA["Sub-agent Sessions / 子Agent隔离会话"]
 
-  M --> CS["CURRENT_STATE short-term workspace"]
-  M --> DLOG["Daily memory log append only"]
+  subgraph L1["Capture & Handoff / 采集与交接层"]
+    CS["CURRENT_STATE.md<br/>Short-term Workspace / 短期工作台"]
+    DL["memory/YYYY-MM-DD.md<br/>Daily Log (append-only) / 日志只追加"]
+    TI["memory/tasks/YYYY-MM-DD.md<br/>Task Cards / 结果卡"]
+    SH["Isolated Session History / 隔离原始轨迹"]
+  end
 
-  SA --> SH["Raw traces in isolated history"]
-  SA --> TIDX["Task memory index by day"]
-  M --> TIDX
+  M --> CS
+  M --> DL
+  M --> TI
+  SA --> SH
+  SA --> TI
 
-  DLOG --> DS["Daily sync 23 00"]
-  TIDX --> DS
-  DS --> F["Fingerprint idempotency state"]
-  DS --> Q1["QMD update daily"]
+  subgraph L2["Consolidation / 提炼层"]
+    DS["memory-sync-daily<br/>Daily Distillation / 日蒸馏"]
+    WT["memory-weekly-tidy<br/>Weekly Consolidation / 周精炼"]
+    PS["processed-sessions.json<br/>Idempotency Cursor / 幂等游标"]
+    LM["MEMORY.md + weekly summary + archive<br/>长期记忆 / 周报 / 归档"]
+  end
 
-  TIDX --> RET["retrieve task cards first"]
-  RET --> SEM["semantic memory search"]
+  DL --> DS
+  TI --> DS
+  DS --> PS
+  DL --> WT
+  TI --> WT
+  WT --> LM
 
-  DLOG --> WT["Weekly tidy Sun 22 00"]
-  TIDX --> WT
-  WT --> LM["Long term memory file"]
-  WT --> WS["Weekly summary file"]
-  WT --> AR["Archive old daily logs"]
-  WT --> Q2["QMD update and embed weekly"]
+  subgraph L3["Retrieval & Reliability / 检索与可靠性层"]
+    R1["Task-first Retrieval / 先查任务卡"]
+    R2["Semantic Search / 语义检索"]
+    Q1["QMD update (daily)"]
+    Q2["QMD update + embed (weekly)"]
+    WD["memory-cron-watchdog<br/>2-hit anomaly confirmation / 连续2次异常确认"]
+  end
 
-  WD["Watchdog every 2 hours"] --> CJ["Cron jobs state"]
-  CJ --> ST["Watchdog state counters and last3"]
-  ST --> DEC{"anomaly count >= 2"}
-  DEC -- No --> SKIP["announce skip"]
-  DEC -- Yes --> ALERT["send optional alert"]
+  TI --> R1 --> R2
+  DS --> Q1
+  WT --> Q2
+  WD --> DS
+  WD --> WT
 ```
 
 ## 1) Design goals
