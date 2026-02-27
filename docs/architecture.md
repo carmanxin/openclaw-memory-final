@@ -4,7 +4,8 @@
 
 ```mermaid
 flowchart TD
-  U["User sessions direct group"] --> DS["Daily sync 23 00"]
+  U["User sessions direct group"] --> CS["CURRENT_STATE short-term workspace"]
+  CS --> DS["Daily sync 23 00"]
   DS --> F["Fingerprint idempotency state"]
   F --> DLOG["Daily memory log append only"]
   DS --> TIDX["Task memory index by day"]
@@ -25,7 +26,6 @@ flowchart TD
   DEC -- Yes --> ALERT["send optional alert"]
 ```
 
-
 ## 1) Design goals
 
 - Reliability: memory tasks should self-heal and avoid silent failure
@@ -35,11 +35,23 @@ flowchart TD
 
 ## 2) Pipeline
 
+### Short-term Workspace (CURRENT_STATE)
+- Keep `memory/CURRENT_STATE.md` as the active workbench for today.
+- This file is the first rescue point after compaction/context reset.
+- It can be overwritten each heartbeat/check cycle (unlike append-only logs).
+- Recommended fields: `today goals / in-progress / blockers / next <=3`.
+
+### Multi-agent memory model (main + sub-agents)
+- Each agent/session keeps independent runtime context; cross-agent continuity should be file-based.
+- Main session is the memory curator: it consolidates durable outcomes and decisions.
+- Sub-agents focus on execution; their raw process remains in isolated session history for auditability.
+- Shared handoff layer is `memory/tasks/YYYY-MM-DD.md` (result-only task cards).
+
 ### Task Memory Index (for sub-agents)
-- Sub-agent raw execution history stays in isolated session history for auditability.
 - Main session writes result-oriented task cards to `memory/tasks/YYYY-MM-DD.md`.
 - Retrieval order should be: task cards first, then semantic memory search, then raw session drill-down.
 - This preserves traceability while avoiding high-token replay of noisy execution logs.
+- Recommended card fields: `goal / boundary / acceptance / key actions / artifact paths / final status / next step`.
 
 ### A. Daily Sync (`memory-sync-daily`)
 - Schedule: `0 23 * * *` (local timezone)
@@ -47,6 +59,7 @@ flowchart TD
 - Filter: skip sessions with `<2` user messages
 - Write target: `memory/YYYY-MM-DD.md` (append-only for today)
 - Idempotency key: message fingerprint from last user message
+- Write discipline: daily logs are append-only; knowledge files should follow read-before-write checks
 
 ### B. Weekly Tidy (`memory-weekly-tidy`)
 - Schedule: `0 22 * * 0`
@@ -69,6 +82,10 @@ flowchart TD
   - stores anomaly counters and `last3` snapshots
 - `memory/tasks/YYYY-MM-DD.md`
   - stores result-only task cards for sub-agent jobs (goal/boundary/acceptance/actions/artifacts/status/next)
+- `memory/CURRENT_STATE.md`
+  - short-term workbench for main session; first read target after compaction/reset
+- `memory/INDEX.md`
+  - navigation entry for long-term/daily/task/state/archive paths
 
 ## 4) QMD strategy
 

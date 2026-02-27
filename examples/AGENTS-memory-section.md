@@ -11,9 +11,16 @@ You wake up fresh each session. Files are your memory.
 
 ### Three-layer memory model
 
+- Short-term workspace: `memory/CURRENT_STATE.md`
 - Daily logs: `memory/YYYY-MM-DD.md`
 - Weekly summaries: `memory/weekly/YYYY-MM-DD.md` (Monday key)
 - Long-term memory: `MEMORY.md` (strictly curated)
+
+### Multi-agent memory handoff
+
+- Main session is the memory curator.
+- Sub-agents keep raw execution in isolated session history.
+- Share outcomes via result-only task cards: `memory/tasks/YYYY-MM-DD.md`.
 
 ### Long-term memory constraints
 

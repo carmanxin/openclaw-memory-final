@@ -18,13 +18,21 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 - 失败标记：`AI_INSTALL_ERROR <reason>`
 - 成功后会输出 JSON 报告（任务名/id/下次运行/QMD 路径/状态文件）。
 
+### OpenClaw 一链即用
+
+如果用户只把这个仓库链接丢给 OpenClaw，代理应直接按下面文档执行：
+- [`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md)
+
+这条路径目标是：**无需手工复制文件，也能直接可用**。
+
 标准提示词见：[`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md)
 
 ## 架构图
 
 ```mermaid
 flowchart LR
-  S["会话输入"] --> A["每日同步任务"]
+  S["会话输入"] --> CS["CURRENT_STATE 短期工作台"]
+  CS --> A["每日同步任务"]
   A --> B["去重状态 processed sessions"]
   B --> C["当日日志 memory YYYY MM DD"]
   A --> T["任务索引 memory tasks"]
@@ -44,8 +52,9 @@ flowchart LR
 
 ## 亮点
 
-- **分层记忆流水线**：`daily sync + weekly tidy + watchdog`
+- **分层记忆流水线**：`短期工作台 + daily sync + weekly tidy + watchdog`
 - **子 agent 任务索引层**：结果卡沉淀到 `memory/tasks/`
+- **内置 MVP 基座**：提供 `CURRENT_STATE` / `memory/INDEX` 模板与 `mem-log.sh`、`memory-reflect.sh` 脚本
 - **幂等写入**：基于消息指纹游标（`processed-sessions.json`）
 - **低噪告警**：同类异常需连续 2 次才告警
 - **成本可控**：日常仅 `qmd update`，周任务执行 `qmd update && qmd embed`
@@ -53,14 +62,18 @@ flowchart LR
 
 ## 架构概览
 
-1. **Daily Sync**（`memory-sync-daily`，本地时间 23:00）
+1. **多 agent 记忆交接层**
+   - 主会话负责沉淀长期可复用记忆。
+   - 子 agent 过程保留在隔离会话历史。
+   - 交接载体统一为 `memory/tasks/YYYY-MM-DD.md` 结果卡。
+2. **Daily Sync**（`memory-sync-daily`，本地时间 23:00）
    - 仅处理最近 26 小时内的新增有效会话
    - 结构化追加到 `memory/YYYY-MM-DD.md`
    - 子 agent 任务仅沉淀结果卡到 `memory/tasks/YYYY-MM-DD.md`
-2. **Weekly Tidy**（`memory-weekly-tidy`，每周日 22:00）
+3. **Weekly Tidy**（`memory-weekly-tidy`，每周日 22:00）
    - 精炼并裁剪 `MEMORY.md`
    - 生成周摘要并归档过期 daily 日志
-3. **Watchdog**（`memory-cron-watchdog`，每 2 小时在 :15 执行）
+4. **Watchdog**（`memory-cron-watchdog`，每 2 小时在 :15 执行）
    - 监控 stale / error / disabled 状态
    - 仅在异常重复出现时告警
 
@@ -84,9 +97,30 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 2. （可选）按 patch 方式应用 `examples/openclaw-memory-config.patch.json`，不要整文件覆盖配置
 3. 重启 gateway：
 
+> `scripts/install-ai.sh` 现已自动完成基座初始化：
+> - `memory/CURRENT_STATE.md`
+> - `memory/INDEX.md`
+> - `scripts/mem-log.sh`
+> - `scripts/memory-reflect.sh`
+
 ```bash
 openclaw gateway restart
 ```
+
+### 安装后核验（必做）
+
+```bash
+openclaw cron list
+ls -l ~/.openclaw/workspace/memory/state/processed-sessions.json
+ls -l ~/.openclaw/workspace/memory/state/memory-watchdog-state.json
+ls -l ~/.openclaw/workspace/memory/CURRENT_STATE.md ~/.openclaw/workspace/memory/INDEX.md
+ls -l ~/.openclaw/workspace/scripts/mem-log.sh ~/.openclaw/workspace/scripts/memory-reflect.sh
+```
+
+预期 cron 名称：
+- `memory-sync-daily`
+- `memory-weekly-tidy`
+- `memory-cron-watchdog`
 
 ## 可选：安装 AI 友好的 workspace skills 包
 

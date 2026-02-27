@@ -5,6 +5,8 @@ set -euo pipefail
 bash -n scripts/setup.sh
 bash -n scripts/uninstall.sh
 bash -n scripts/install-ai.sh
+bash -n scripts/mem-log.sh
+bash -n scripts/memory-reflect.sh
 
 # json validity
 jq empty examples/openclaw-memory-config.patch.json

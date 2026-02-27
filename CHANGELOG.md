@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- MVP memory baseline assets:
+  - `examples/CURRENT_STATE.md.template`
+  - `examples/memory-INDEX.md.template`
+  - `scripts/mem-log.sh`
+  - `scripts/memory-reflect.sh`
+
+### Changed
+- README (EN/ZH): streamlined install flow to one-link usage; `install-ai.sh` now auto-bootstraps MVP baseline files.
+- README (EN/ZH): architecture overview now explicitly includes multi-agent memory handoff (main session curation + sub-agent task cards).
+- `docs/architecture.md`: included short-term `CURRENT_STATE` layer and explicit multi-agent memory model in pipeline/system docs.
+- `docs/operations.md`: updated baseline section to use installed workspace scripts directly.
+- `docs/ai-agent-prompt.md`: clarified that one-command install also initializes baseline memory files/scripts.
+- `examples/AGENTS-memory-section.md`: added short-term workspace + multi-agent handoff guidance.
+- `scripts/setup.sh`: now auto-initializes MVP baseline files/scripts into target workspace and reports them in JSON output.
+- `scripts/validate.sh`: now validates shell syntax for new helper scripts.
+
 ## [0.2.3] - 2026-02-25
 
 ### Fixed
