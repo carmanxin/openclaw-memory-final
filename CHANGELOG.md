@@ -16,10 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - README (EN/ZH): streamlined install flow to one-link usage; `install-ai.sh` now auto-bootstraps MVP baseline files.
+- README (EN/ZH): added explicit QMD prerequisite and `qmd_not_found` recovery guidance (install + absolute path retry).
 - README (EN/ZH): architecture overview now explicitly includes multi-agent memory handoff (main session curation + sub-agent task cards) and upgraded product-style bilingual diagrams.
 - `docs/architecture.md`: included short-term `CURRENT_STATE` layer and explicit multi-agent memory model in pipeline/system docs, with updated diagram for sub-agent isolation/handoff.
 - `docs/operations.md`: updated baseline section to use installed workspace scripts directly.
-- `docs/ai-agent-prompt.md`: clarified that one-command install also initializes baseline memory files/scripts.
+- `docs/ai-agent-prompt.md`: clarified one-command install bootstrap and added QMD missing auto-recovery steps.
+- `docs/troubleshooting-gateway.md`: expanded QMD missing/invalid-path diagnosis and fixed commands.
 - `examples/AGENTS-memory-section.md`: added short-term workspace + multi-agent handoff guidance.
 - `scripts/setup.sh`: now auto-initializes MVP baseline files/scripts into target workspace and reports them in JSON output.
 - `scripts/validate.sh`: now validates shell syntax for new helper scripts.

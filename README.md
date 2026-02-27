@@ -10,6 +10,24 @@ Production-grade, open-source memory architecture for OpenClaw.
 
 **Short description:** A practical OpenClaw memory framework with daily sync, weekly tidy, and watchdog reliability.
 
+## Prerequisites
+
+- Node.js >= 22
+- `qmd` CLI available in PATH (or pass `--qmd-path`)
+
+Install QMD if missing:
+
+```bash
+npm install -g @tobilu/qmd
+qmd --version
+```
+
+If your shell cannot find it, retry with absolute path:
+
+```bash
+bash scripts/install-ai.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
+```
+
 ## AI-first Install (Recommended)
 
 For agent-driven deployment, use one command:
@@ -20,6 +38,7 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 
 - Success marker: `AI_INSTALL_OK`
 - Failure marker: `AI_INSTALL_ERROR <reason>`
+- If `AI_INSTALL_ERROR qmd_not_found`: install QMD first (`npm install -g @tobilu/qmd`) or rerun with `--qmd-path /absolute/path/to/qmd`
 - On success, it prints a JSON report (jobs, ids, next runs, qmd path, state files).
 
 ### OpenClaw one-link usage

@@ -6,6 +6,24 @@
 
 **AI 直链可部署：**可以。仅给仓库链接时，建议直接使用 [`docs/ai-agent-prompt.md`](docs/ai-agent-prompt.md) 这份标准提示词完成确定性落地。
 
+## 前置依赖
+
+- Node.js >= 22
+- 系统可执行 `qmd`（或安装时传入 `--qmd-path`）
+
+若缺少 QMD，先安装：
+
+```bash
+npm install -g @tobilu/qmd
+qmd --version
+```
+
+若 PATH 异常，建议用绝对路径重试：
+
+```bash
+bash scripts/install-ai.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
+```
+
 ## AI 优先安装（推荐）
 
 面向 Agent 部署，建议直接使用单命令：
@@ -16,6 +34,7 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 
 - 成功标记：`AI_INSTALL_OK`
 - 失败标记：`AI_INSTALL_ERROR <reason>`
+- 若出现 `AI_INSTALL_ERROR qmd_not_found`：先安装 QMD（`npm install -g @tobilu/qmd`），或用 `--qmd-path /absolute/path/to/qmd` 重试
 - 成功后会输出 JSON 报告（任务名/id/下次运行/QMD 路径/状态文件）。
 
 ### OpenClaw 一链即用

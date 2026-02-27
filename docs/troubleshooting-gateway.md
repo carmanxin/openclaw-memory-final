@@ -23,11 +23,17 @@ openclaw doctor --non-interactive
      bash scripts/setup.sh --command-timeout 60 --qmd-path "$(command -v qmd)"
      ```
 
-3. **Invalid qmd path**
-   - Symptom: memory jobs fail repeatedly
-   - Fix: pass explicit executable path:
+3. **QMD missing or invalid path**
+   - Symptom: `AI_INSTALL_ERROR qmd_not_found` or memory jobs fail repeatedly
+   - Fix:
      ```bash
-     bash scripts/setup.sh --qmd-path /absolute/path/to/qmd
+     npm install -g @tobilu/qmd
+     qmd --version
+     bash scripts/setup.sh --qmd-path "$(command -v qmd)"
+     ```
+   - If running in isolated/cron environment, prefer absolute path (example):
+     ```bash
+     bash scripts/setup.sh --qmd-path /home/jiumu/.nvm/versions/node/v22.22.0/bin/qmd
      ```
 
 ## 3) Recovery
