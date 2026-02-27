@@ -17,6 +17,21 @@ Expected jobs:
 openclaw cron run <job-id>
 ```
 
+## MVP baseline bootstrap (recommended)
+
+The one-command installer already bootstraps baseline files into workspace:
+- `memory/CURRENT_STATE.md`
+- `memory/INDEX.md`
+- `scripts/mem-log.sh`
+- `scripts/memory-reflect.sh`
+
+Usage examples:
+
+```bash
+~/.openclaw/workspace/scripts/mem-log.sh "key decision: ..."
+~/.openclaw/workspace/scripts/memory-reflect.sh
+```
+
 ## Sub-agent task memory practice
 
 - Keep sub-agent raw traces in isolated session history.

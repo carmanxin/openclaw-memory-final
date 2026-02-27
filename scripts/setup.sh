@@ -78,7 +78,7 @@ fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-mkdir -p "$WORKSPACE/memory/weekly" "$WORKSPACE/memory/archive/$(date +%Y)" "$WORKSPACE/memory/state" "$WORKSPACE/memory/tasks"
+mkdir -p "$WORKSPACE/memory/weekly" "$WORKSPACE/memory/archive/$(date +%Y)" "$WORKSPACE/memory/state" "$WORKSPACE/memory/tasks" "$WORKSPACE/scripts"
 
 if [[ ! -f "$WORKSPACE/memory/state/processed-sessions.json" ]]; then
   cp "$REPO_ROOT/examples/memory/state/processed-sessions.json" "$WORKSPACE/memory/state/processed-sessions.json"
@@ -86,6 +86,19 @@ fi
 if [[ ! -f "$WORKSPACE/memory/state/memory-watchdog-state.json" ]]; then
   cp "$REPO_ROOT/examples/memory/state/memory-watchdog-state.json" "$WORKSPACE/memory/state/memory-watchdog-state.json"
 fi
+if [[ ! -f "$WORKSPACE/memory/CURRENT_STATE.md" ]]; then
+  cp "$REPO_ROOT/examples/CURRENT_STATE.md.template" "$WORKSPACE/memory/CURRENT_STATE.md"
+fi
+if [[ ! -f "$WORKSPACE/memory/INDEX.md" ]]; then
+  cp "$REPO_ROOT/examples/memory-INDEX.md.template" "$WORKSPACE/memory/INDEX.md"
+fi
+if [[ ! -f "$WORKSPACE/scripts/mem-log.sh" ]]; then
+  cp "$REPO_ROOT/scripts/mem-log.sh" "$WORKSPACE/scripts/mem-log.sh"
+fi
+if [[ ! -f "$WORKSPACE/scripts/memory-reflect.sh" ]]; then
+  cp "$REPO_ROOT/scripts/memory-reflect.sh" "$WORKSPACE/scripts/memory-reflect.sh"
+fi
+chmod +x "$WORKSPACE/scripts/mem-log.sh" "$WORKSPACE/scripts/memory-reflect.sh"
 
 list_jobs_json() {
   run_oc cron list --json 2>/dev/null || echo '{"jobs":[]}'
@@ -232,7 +245,11 @@ result = {
     "stateFiles": {
         "processedSessions": os.path.isfile(os.path.join(workspace, "memory/state/processed-sessions.json")),
         "watchdogState": os.path.isfile(os.path.join(workspace, "memory/state/memory-watchdog-state.json")),
-        "taskMemoryDir": os.path.isdir(os.path.join(workspace, "memory/tasks"))
+        "taskMemoryDir": os.path.isdir(os.path.join(workspace, "memory/tasks")),
+        "currentState": os.path.isfile(os.path.join(workspace, "memory/CURRENT_STATE.md")),
+        "memoryIndex": os.path.isfile(os.path.join(workspace, "memory/INDEX.md")),
+        "memLogScript": os.path.isfile(os.path.join(workspace, "scripts/mem-log.sh")),
+        "memoryReflectScript": os.path.isfile(os.path.join(workspace, "scripts/memory-reflect.sh"))
     },
     "jobs": sorted(installed, key=lambda x: x["name"])
 }

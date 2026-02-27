@@ -10,6 +10,7 @@ https://github.com/codesfly/openclaw-memory-final
 1) clone 仓库到临时目录
 2) 执行（单命令安装，AI 友好）：
    bash scripts/install-ai.sh --tz Asia/Shanghai
+   （该命令会自动初始化 `memory/CURRENT_STATE.md`、`memory/INDEX.md`、`scripts/mem-log.sh`、`scripts/memory-reflect.sh`）
 3) 若返回 `AI_INSTALL_ERROR qmd_not_found`，则停止并提示我提供 qmd 绝对路径
 4) 若成功，必须输出 install-ai.sh 返回的 JSON 原文
 5) 再执行一次核验：

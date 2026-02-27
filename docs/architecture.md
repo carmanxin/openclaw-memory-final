@@ -3,28 +3,32 @@
 ## 0) System Diagram
 
 ```mermaid
-flowchart TD
-  U["User sessions direct group"] --> DS["Daily sync 23 00"]
-  DS --> F["Fingerprint idempotency state"]
-  F --> DLOG["Daily memory log append only"]
-  DS --> TIDX["Task memory index by day"]
-  TIDX --> RET["retrieve task cards first"]
-  DLOG --> Q1["QMD update daily"]
+flowchart LR
+  U["Users & Channels<br/>用户与多渠道"] --> M["Main Session<br/>主会话"]
+  U --> SA["Sub-agents (Isolated)<br/>子Agent（隔离）"]
 
-  DLOG --> WT["Weekly tidy Sun 22 00"]
-  TIDX --> WT
-  WT --> LM["Long term memory file"]
-  WT --> WS["Weekly summary file"]
-  WT --> AR["Archive old daily logs"]
-  WT --> Q2["QMD update and embed weekly"]
+  M --> CS["CURRENT_STATE<br/>短期工作台"]
+  M --> DL["Daily Log<br/>日记忆日志"]
+  M --> TC["Task Cards<br/>任务结果卡"]
+  SA --> TC
 
-  WD["Watchdog every 2 hours"] --> CJ["Cron jobs state"]
-  CJ --> ST["Watchdog state counters and last3"]
-  ST --> DEC{"anomaly count >= 2"}
-  DEC -- No --> SKIP["announce skip"]
-  DEC -- Yes --> ALERT["send optional alert"]
+  DL --> SYNC["Daily Sync<br/>每日蒸馏"]
+  TC --> SYNC
+  SYNC --> CUR["Idempotency Cursor<br/>幂等游标"]
+
+  DL --> TIDY["Weekly Tidy<br/>每周精炼"]
+  TC --> TIDY
+  TIDY --> LM["Long-term Memory<br/>长期记忆 + 周报 + 归档"]
+
+  TC --> RET["Task-first Retrieval<br/>先查任务卡"]
+  RET --> SEM["Semantic Search<br/>语义检索"]
+
+  SYNC --> Q1["QMD update"]
+  TIDY --> Q2["QMD update + embed"]
+
+  WD["Watchdog<br/>稳定性守护"] --> SYNC
+  WD --> TIDY
 ```
-
 
 ## 1) Design goals
 
@@ -35,11 +39,23 @@ flowchart TD
 
 ## 2) Pipeline
 
+### Short-term Workspace (CURRENT_STATE)
+- Keep `memory/CURRENT_STATE.md` as the active workbench for today.
+- This file is the first rescue point after compaction/context reset.
+- It can be overwritten each heartbeat/check cycle (unlike append-only logs).
+- Recommended fields: `today goals / in-progress / blockers / next <=3`.
+
+### Multi-agent memory model (main + sub-agents)
+- Each agent/session keeps independent runtime context; cross-agent continuity should be file-based.
+- Main session is the memory curator: it consolidates durable outcomes and decisions.
+- Sub-agents focus on execution; their raw process remains in isolated session history for auditability.
+- Shared handoff layer is `memory/tasks/YYYY-MM-DD.md` (result-only task cards).
+
 ### Task Memory Index (for sub-agents)
-- Sub-agent raw execution history stays in isolated session history for auditability.
 - Main session writes result-oriented task cards to `memory/tasks/YYYY-MM-DD.md`.
 - Retrieval order should be: task cards first, then semantic memory search, then raw session drill-down.
 - This preserves traceability while avoiding high-token replay of noisy execution logs.
+- Recommended card fields: `goal / boundary / acceptance / key actions / artifact paths / final status / next step`.
 
 ### A. Daily Sync (`memory-sync-daily`)
 - Schedule: `0 23 * * *` (local timezone)
@@ -47,6 +63,7 @@ flowchart TD
 - Filter: skip sessions with `<2` user messages
 - Write target: `memory/YYYY-MM-DD.md` (append-only for today)
 - Idempotency key: message fingerprint from last user message
+- Write discipline: daily logs are append-only; knowledge files should follow read-before-write checks
 
 ### B. Weekly Tidy (`memory-weekly-tidy`)
 - Schedule: `0 22 * * 0`
@@ -69,6 +86,10 @@ flowchart TD
   - stores anomaly counters and `last3` snapshots
 - `memory/tasks/YYYY-MM-DD.md`
   - stores result-only task cards for sub-agent jobs (goal/boundary/acceptance/actions/artifacts/status/next)
+- `memory/CURRENT_STATE.md`
+  - short-term workbench for main session; first read target after compaction/reset
+- `memory/INDEX.md`
+  - navigation entry for long-term/daily/task/state/archive paths
 
 ## 4) QMD strategy
 
