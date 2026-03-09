@@ -3,9 +3,15 @@
 
 import argparse
 import json
+import os
 import subprocess
 import time
 from pathlib import Path
+
+
+def default_workspace() -> Path:
+    ws = os.environ.get("OPENCLAW_WORKSPACE")
+    return Path(ws).expanduser() if ws else Path.home() / ".openclaw" / "workspace"
 
 
 def run(cmd, timeout=40):
@@ -31,18 +37,16 @@ def parse_pending(status_text: str) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Watchdog for memory retrieval health")
+    ws = default_workspace()
     ap.add_argument("--qmd-path", default="qmd")
     ap.add_argument("--collection", default="workspace")
     ap.add_argument("--query", default="记忆")
-    ap.add_argument(
-        "--state",
-        default="/home/jiumu/.openclaw/workspace/memory/state/memory-retrieval-watchdog-state.json",
-    )
+    ap.add_argument("--state", default=str(ws / "memory" / "state" / "memory-retrieval-watchdog-state.json"))
     ap.add_argument("--confirm", type=int, default=2, help="consecutive anomalies before confirmed")
     ap.add_argument("--pending-threshold", type=int, default=120)
     args = ap.parse_args()
 
-    state_p = Path(args.state)
+    state_p = Path(args.state).expanduser()
     state_p.parent.mkdir(parents=True, exist_ok=True)
     try:
         state = json.loads(state_p.read_text(encoding="utf-8")) if state_p.exists() else {}

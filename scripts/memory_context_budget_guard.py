@@ -8,7 +8,13 @@ and writes machine-readable state for watchdog/reporting.
 import argparse
 import datetime as dt
 import json
+import os
 from pathlib import Path
+
+
+def default_workspace() -> Path:
+    ws = os.environ.get("OPENCLAW_WORKSPACE")
+    return Path(ws).expanduser() if ws else Path.home() / ".openclaw" / "workspace"
 
 
 def read_text_len(p: Path) -> int:
@@ -19,17 +25,15 @@ def read_text_len(p: Path) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Memory context budget guard")
-    ap.add_argument("--workspace", default="/home/jiumu/.openclaw/workspace")
+    ap.add_argument("--workspace", default=str(default_workspace()))
     ap.add_argument("--max-per-file", type=int, default=20000)
     ap.add_argument("--max-total", type=int, default=80000)
     ap.add_argument("--profile", default="main")
-    ap.add_argument(
-        "--state",
-        default="/home/jiumu/.openclaw/workspace/memory/state/context-budget-state.json",
-    )
+    ap.add_argument("--state")
     args = ap.parse_args()
 
-    ws = Path(args.workspace)
+    ws = Path(args.workspace).expanduser()
+    state_path = Path(args.state).expanduser() if args.state else ws / "memory" / "state" / "context-budget-state.json"
     now = dt.datetime.now()
     today = now.strftime("%Y-%m-%d")
     yesterday = (now - dt.timedelta(days=1)).strftime("%Y-%m-%d")
@@ -67,9 +71,8 @@ def main() -> int:
         "ok": len(anomalies) == 0,
     }
 
-    state = Path(args.state)
-    state.parent.mkdir(parents=True, exist_ok=True)
-    state.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     if out["ok"]:
         print(f"OK total={total} anomalies=0")

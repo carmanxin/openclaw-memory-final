@@ -9,6 +9,7 @@ OPS_ACCOUNT="${OPS_ACCOUNT:-ops}"
 OPS_TARGET="${OPS_TARGET:-}"
 RETRIEVAL_MODEL="${RETRIEVAL_MODEL:-glm5}"
 FORCE_RECREATE=0
+REFRESH_SCRIPTS=0
 CMD_TIMEOUT_SEC="${OPENCLAW_CMD_TIMEOUT_SEC:-25}"
 SKIP_HEALTHCHECK=0
 PRINT_JSON=0
@@ -31,6 +32,8 @@ while [[ $# -gt 0 ]]; do
       RETRIEVAL_MODEL="$2"; shift 2 ;;
     --force-recreate)
       FORCE_RECREATE=1; shift ;;
+    --refresh-scripts)
+      REFRESH_SCRIPTS=1; shift ;;
     --command-timeout)
       CMD_TIMEOUT_SEC="$2"; shift 2 ;;
     --skip-healthcheck)
@@ -108,7 +111,7 @@ fi
 # Helper scripts
 for f in mem-log.sh memory-reflect.sh \
   memory_context_budget_guard.py memory_context_pack.py memory_conflict_check.py memory_retrieval_watchdog.py; do
-  if [[ ! -f "$WORKSPACE/scripts/$f" ]]; then
+  if [[ "$REFRESH_SCRIPTS" -eq 1 || ! -f "$WORKSPACE/scripts/$f" ]]; then
     cp "$REPO_ROOT/scripts/$f" "$WORKSPACE/scripts/$f"
   fi
 done
@@ -177,7 +180,7 @@ fi
 
 WATCHDOG_MSG="你是memory watchdog。检查 memory-sync-daily / memory-weekly-tidy / memory-retrieval-watchdog-v1 / memory-qmd-nightly-maintain 是否 enabled、lastStatus 非 error/failed、且未 stale。维护 memory/state/memory-watchdog-state.json 的 consecutiveAnomalies 与 last3 快照。仅连续2次异常才算 confirmed anomaly；首轮异常只计数不告警。$WATCHDOG_NOTIFY 完成回复ANNOUNCE_SKIP。"
 
-RETRIEVAL_WATCHDOG_MSG="你是 memory retrieval watchdog。执行：python3 $WORKSPACE/scripts/memory_retrieval_watchdog.py --qmd-path $QMD_PATH。读取 $WORKSPACE/memory/state/memory-retrieval-watchdog-state.json。规则：healthy 或 FIRST_ANOMALY（未confirmed）时回复 ANNOUNCE_SKIP；$RETRIEVAL_NOTIFY 发送后回复 ANNOUNCE_SKIP。"
+RETRIEVAL_WATCHDOG_MSG="你是 memory retrieval watchdog。执行：python3 $WORKSPACE/scripts/memory_retrieval_watchdog.py --qmd-path $QMD_PATH --state $WORKSPACE/memory/state/memory-retrieval-watchdog-state.json。读取 $WORKSPACE/memory/state/memory-retrieval-watchdog-state.json。规则：healthy 或 FIRST_ANOMALY（未confirmed）时回复 ANNOUNCE_SKIP；$RETRIEVAL_NOTIFY 发送后回复 ANNOUNCE_SKIP。"
 
 NIGHTLY_MAINTAIN_MSG="你是 memory maintenance agent。每天执行一次 QMD 维护（低噪声）：1) QMD_GPU=cpu $QMD_PATH update；2) QMD_GPU=cpu $QMD_PATH status 并解析 Pending；3) 若 Pending>=30 再执行 QMD_GPU=cpu $QMD_PATH embed；4) 再次 status 复查。成功且无异常则 ANNOUNCE_SKIP。$NIGHTLY_NOTIFY 完成后回复 ANNOUNCE_SKIP。"
 

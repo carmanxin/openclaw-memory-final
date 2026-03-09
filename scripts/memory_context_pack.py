@@ -4,7 +4,13 @@
 import argparse
 import datetime as dt
 import json
+import os
 from pathlib import Path
+
+
+def default_workspace() -> Path:
+    ws = os.environ.get("OPENCLAW_WORKSPACE")
+    return Path(ws).expanduser() if ws else Path.home() / ".openclaw" / "workspace"
 
 
 def resolve_path(ws: Path, p: str) -> Path:
@@ -17,17 +23,15 @@ def resolve_path(ws: Path, p: str) -> Path:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Build dynamic memory context pack")
-    ap.add_argument("--workspace", default="/home/jiumu/.openclaw/workspace")
-    ap.add_argument(
-        "--config",
-        default="/home/jiumu/.openclaw/workspace/memory/context-profiles.json",
-    )
+    ap.add_argument("--workspace", default=str(default_workspace()))
+    ap.add_argument("--config")
     ap.add_argument("--profile", default="main")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
-    ws = Path(args.workspace)
-    cfg = json.loads(Path(args.config).read_text(encoding="utf-8"))
+    ws = Path(args.workspace).expanduser()
+    config_path = Path(args.config).expanduser() if args.config else ws / "memory" / "context-profiles.json"
+    cfg = json.loads(config_path.read_text(encoding="utf-8"))
     if args.profile not in cfg.get("profiles", {}):
         raise SystemExit(f"unknown profile: {args.profile}")
 

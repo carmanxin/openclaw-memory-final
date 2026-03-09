@@ -14,6 +14,12 @@ python3 -m py_compile scripts/memory_context_pack.py
 python3 -m py_compile scripts/memory_conflict_check.py
 python3 -m py_compile scripts/memory_retrieval_watchdog.py
 
+# guard against runtime hardcoded workspace paths
+if grep -RIn "/home/jiumu" scripts/*.py >/dev/null; then
+  echo "❌ runtime scripts still contain hardcoded /home/jiumu path" >&2
+  exit 1
+fi
+
 # json validity
 jq empty examples/openclaw-memory-config.patch.json
 jq empty examples/memory/state/processed-sessions.json

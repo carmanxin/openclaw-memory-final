@@ -3,8 +3,14 @@
 
 import argparse
 import json
+import os
 import re
 from pathlib import Path
+
+
+def default_workspace() -> Path:
+    ws = os.environ.get("OPENCLAW_WORKSPACE")
+    return Path(ws).expanduser() if ws else Path.home() / ".openclaw" / "workspace"
 
 
 def extract_bullets(path: Path):
@@ -29,21 +35,18 @@ def find_route_ids(lines):
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Detect memory conflicts")
-    ap.add_argument("--memory", default="/home/jiumu/.openclaw/workspace/MEMORY.md")
-    ap.add_argument(
-        "--out",
-        default="/home/jiumu/.openclaw/workspace/memory/state/memory-conflict-report.json",
-    )
+    ws = default_workspace()
+    ap.add_argument("--memory", default=str(ws / "MEMORY.md"))
+    ap.add_argument("--out", default=str(ws / "memory" / "state" / "memory-conflict-report.json"))
     args = ap.parse_args()
 
-    p = Path(args.memory)
+    p = Path(args.memory).expanduser()
     lines = extract_bullets(p)
 
     models = find_models(lines)
     routes = find_route_ids(lines)
 
     findings = []
-    # informational signal: multiple model hints exist
     if len(models) >= 4:
         findings.append(
             {
@@ -53,7 +56,6 @@ def main() -> int:
             }
         )
 
-    # warning signal: too many route/chat ids may indicate conflicting routing rules
     if len(routes) > 2:
         findings.append(
             {
@@ -69,7 +71,7 @@ def main() -> int:
         "memory_file": str(p),
     }
 
-    outp = Path(args.out)
+    outp = Path(args.out).expanduser()
     outp.parent.mkdir(parents=True, exist_ok=True)
     outp.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
