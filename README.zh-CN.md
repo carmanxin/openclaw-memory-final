@@ -11,6 +11,8 @@
 - Node.js >= 22
 - 系统可执行 `qmd`（或安装时传入 `--qmd-path`）
 
+> 生产 / cron / isolated 环境强烈建议显式传入**绝对路径** `--qmd-path`，不要依赖 PATH 继承。
+
 若缺少 QMD，先安装：
 
 ```bash
@@ -29,13 +31,14 @@ bash scripts/install-ai.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
 面向 Agent 部署，建议直接使用单命令：
 
 ```bash
-bash scripts/install-ai.sh --tz Asia/Shanghai
+bash scripts/install-ai.sh --tz Asia/Shanghai --retrieval-model glm5
 ```
 
 - 成功标记：`AI_INSTALL_OK`
 - 失败标记：`AI_INSTALL_ERROR <reason>`
 - 若出现 `AI_INSTALL_ERROR qmd_not_found`：先安装 QMD（`npm install -g @tobilu/qmd`），或用 `--qmd-path /absolute/path/to/qmd` 重试
-- 成功后会输出 JSON 报告（任务名/id/下次运行/QMD 路径/状态文件）。
+- `--retrieval-model` 用于指定 `memory-retrieval-watchdog-v1` 使用的模型（默认：`glm5`）
+- 成功后会输出 JSON 报告（任务名/id/下次运行/QMD 路径/状态文件/检索模型）。
 
 ### OpenClaw 一链即用
 
@@ -120,8 +123,9 @@ flowchart LR
 ## 检索顺序（建议）
 
 1. 先读 `memory/tasks/*.md`（任务结果）
-2. 再做语义记忆检索
-3. 最后按需下钻子 agent 原始会话
+2. 再做语义记忆检索（`memory_search`）
+3. 只拉取所需片段（`memory_get`）
+4. 最后按需下钻子 agent 原始会话
 
 ## 快速开始
 
@@ -151,6 +155,8 @@ openclaw gateway restart
 ```
 
 ### 安装后核验（必做）
+
+如果你配置了 `--ops-target`，安装后务必做一次 dry-run 或真实探针发信校验。`OPS_TARGET` 可以是私聊 id、群 id 或 supergroup id；Telegram 群升级后，旧群 id 不一定继续有效。
 
 ```bash
 openclaw cron list
@@ -211,15 +217,15 @@ openclaw skills list --eligible
 ## 更新日志 / Release Notes
 
 - 完整日志：[`CHANGELOG.md`](CHANGELOG.md)
-- 最新发布：[`v0.4.0`](https://github.com/codesfly/openclaw-memory-final/releases/tag/v0.4.0)
+- 最新发布：`待发布 v0.4.1`
 
-### v0.4.0 重点
+### 即将发布的 v0.4.1 重点
 
-- 新增记忆注入预算 + 动态 profile 注入（`main/ops/btc/quant`）
-- 新增长期记忆冲突检测
-- 新增检索健康 watchdog + 夜间 QMD 维护
-- 升级 setup/uninstall/validate 脚本，覆盖 V1 记忆运维链路
-- 文档与安装核验流程同步升级
+- 为 `memory-retrieval-watchdog-v1` 增加显式 `--retrieval-model` 支持（默认 `glm5`）
+- 明确 `OPS_TARGET` 支持私聊 / 群 / supergroup，且安装后应做路由探测
+- 强化 cron / isolated 环境下使用绝对 `--qmd-path` 的说明
+- 明确推荐检索顺序：`memory/tasks` -> `memory_search` -> `memory_get`
+- 文档与安装说明同步对齐当前 OpenClaw 运行行为
 
 ## 仓库结构
 

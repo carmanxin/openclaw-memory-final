@@ -37,8 +37,9 @@ You wake up fresh each session. Files are your memory.
 ### Retrieval order
 
 1. Check `memory/tasks/*.md` first
-2. Then run semantic memory search
-3. Drill into raw session history only when needed
+2. Then run semantic memory search (`memory_search`)
+3. Pull only the needed snippet (`memory_get`)
+4. Drill into raw session history only when needed
 
 ### Context budget + dynamic profile (V1)
 

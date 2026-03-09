@@ -7,6 +7,7 @@ QMD_PATH="${QMD_PATH:-}"
 OPS_CHANNEL="telegram"
 OPS_ACCOUNT="ops"
 OPS_TARGET=""
+RETRIEVAL_MODEL="glm5"
 CMD_TIMEOUT_SEC="60"
 FORCE_RECREATE=0
 
@@ -24,6 +25,8 @@ while [[ $# -gt 0 ]]; do
       OPS_ACCOUNT="$2"; shift 2 ;;
     --ops-target)
       OPS_TARGET="$2"; shift 2 ;;
+    --retrieval-model)
+      RETRIEVAL_MODEL="$2"; shift 2 ;;
     --command-timeout)
       CMD_TIMEOUT_SEC="$2"; shift 2 ;;
     --force-recreate)
@@ -47,6 +50,7 @@ ARGS=(
   --tz "$TZ_VALUE"
   --workspace "$WORKSPACE"
   --qmd-path "$QMD_PATH"
+  --retrieval-model "$RETRIEVAL_MODEL"
   --command-timeout "$CMD_TIMEOUT_SEC"
   --print-json
 )

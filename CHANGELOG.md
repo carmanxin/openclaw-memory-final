@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-03-09
+
+### Added
+- Added `--retrieval-model` to `scripts/setup.sh` and `scripts/install-ai.sh`.
+- Installation JSON output now includes `retrievalModel` for easier verification.
+
+### Changed
+- `memory-retrieval-watchdog-v1` now installs with an explicit model override (default: `glm5`) to avoid slow or broken fallback chains in lightweight cron checks.
+- README (EN/ZH), operations runbook, cron prompt reference, AI bootstrap prompt, and AGENTS example now document:
+  - explicit retrieval order `memory/tasks -> memory_search -> memory_get`
+  - absolute `--qmd-path` recommendation for cron/isolated environments
+  - `OPS_TARGET` compatibility with direct chat / group / supergroup and the need for post-install route probes
+
 ## [0.4.0] - 2026-03-06
 
 ### Added

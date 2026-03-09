@@ -15,6 +15,8 @@ Production-grade, open-source memory architecture for OpenClaw.
 - Node.js >= 22
 - `qmd` CLI available in PATH (or pass `--qmd-path`)
 
+> Recommended for production/cron installs: always pass an **absolute** `--qmd-path` instead of relying on PATH inheritance.
+
 Install QMD if missing:
 
 ```bash
@@ -33,13 +35,14 @@ bash scripts/install-ai.sh --tz Asia/Shanghai --qmd-path "$(command -v qmd)"
 For agent-driven deployment, use one command:
 
 ```bash
-bash scripts/install-ai.sh --tz Asia/Shanghai
+bash scripts/install-ai.sh --tz Asia/Shanghai --retrieval-model glm5
 ```
 
 - Success marker: `AI_INSTALL_OK`
 - Failure marker: `AI_INSTALL_ERROR <reason>`
 - If `AI_INSTALL_ERROR qmd_not_found`: install QMD first (`npm install -g @tobilu/qmd`) or rerun with `--qmd-path /absolute/path/to/qmd`
-- On success, it prints a JSON report (jobs, ids, next runs, qmd path, state files).
+- `--retrieval-model` controls the model used by `memory-retrieval-watchdog-v1` (default: `glm5`)
+- On success, it prints a JSON report (jobs, ids, next runs, qmd path, state files, retrieval model).
 
 ### OpenClaw one-link usage
 
@@ -149,6 +152,8 @@ openclaw gateway restart
 
 ### Post-install verification (required)
 
+If you configured `--ops-target`, send one dry-run or real probe message after install. `OPS_TARGET` may be a direct/private chat id, a group id, or a supergroup id; do not assume a legacy group id will survive Telegram group upgrades unchanged.
+
 ```bash
 openclaw cron list
 ls -l ~/.openclaw/workspace/memory/state/processed-sessions.json
@@ -208,8 +213,9 @@ Notes:
 ## Retrieval Order (recommended)
 
 1. Check `memory/tasks/*.md` for task outcomes
-2. Then use semantic memory search
-3. Drill into raw sub-agent session history only when necessary
+2. Then use semantic memory search (`memory_search`)
+3. Pull only the needed snippet (`memory_get`)
+4. Drill into raw sub-agent session history only when necessary
 
 ## Repository Layout
 
@@ -227,15 +233,15 @@ This project follows **Semantic Versioning**.
 ## Changelog / Release Notes
 
 - Full changelog: [`CHANGELOG.md`](CHANGELOG.md)
-- Latest release: [`v0.4.0`](https://github.com/codesfly/openclaw-memory-final/releases/tag/v0.4.0)
+- Latest release: `pending v0.4.1`
 
-### v0.4.0 highlights
+### Upcoming v0.4.1 highlights
 
-- Added context budget + dynamic profile injection (`main/ops/btc/quant`)
-- Added durable-memory conflict checker
-- Added retrieval watchdog + nightly QMD maintenance flow
-- Updated setup/uninstall/validate scripts for the new memory ops pipeline
-- Updated docs and install verification for V1 memory scheme
+- Added explicit `--retrieval-model` support (default `glm5`) for `memory-retrieval-watchdog-v1`
+- Clarified `OPS_TARGET` can be direct chat / group / supergroup and should be verified after install
+- Strengthened guidance to pass absolute `--qmd-path` in cron/isolated environments
+- Clarified recommended retrieval order: `memory/tasks` -> `memory_search` -> `memory_get`
+- Updated install/docs/runbook text for the current OpenClaw runtime behavior
 
 ## License
 

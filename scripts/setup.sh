@@ -7,6 +7,7 @@ QMD_PATH="${QMD_PATH:-}"
 OPS_CHANNEL="${OPS_CHANNEL:-telegram}"
 OPS_ACCOUNT="${OPS_ACCOUNT:-ops}"
 OPS_TARGET="${OPS_TARGET:-}"
+RETRIEVAL_MODEL="${RETRIEVAL_MODEL:-glm5}"
 FORCE_RECREATE=0
 CMD_TIMEOUT_SEC="${OPENCLAW_CMD_TIMEOUT_SEC:-25}"
 SKIP_HEALTHCHECK=0
@@ -26,6 +27,8 @@ while [[ $# -gt 0 ]]; do
       OPS_ACCOUNT="$2"; shift 2 ;;
     --ops-target)
       OPS_TARGET="$2"; shift 2 ;;
+    --retrieval-model)
+      RETRIEVAL_MODEL="$2"; shift 2 ;;
     --force-recreate)
       FORCE_RECREATE=1; shift ;;
     --command-timeout)
@@ -231,6 +234,7 @@ ensure_job "memory-retrieval-watchdog-v1" \
   --tz "$TZ_VALUE" \
   --session isolated \
   --agent main \
+  --model "$RETRIEVAL_MODEL" \
   --timeout-seconds 300 \
   --no-deliver \
   --message "$RETRIEVAL_WATCHDOG_MSG"
@@ -255,10 +259,10 @@ fi
 
 JOBS_JSON="$(list_jobs_json)"
 if [[ "$PRINT_JSON" -eq 1 ]]; then
-  LIST_JOBS_JSON="$JOBS_JSON" python3 - "$TZ_VALUE" "$WORKSPACE" "$QMD_PATH" "$OPS_CHANNEL" "$OPS_ACCOUNT" "$OPS_TARGET" <<'PY'
+  LIST_JOBS_JSON="$JOBS_JSON" python3 - "$TZ_VALUE" "$WORKSPACE" "$QMD_PATH" "$OPS_CHANNEL" "$OPS_ACCOUNT" "$OPS_TARGET" "$RETRIEVAL_MODEL" <<'PY'
 import json, os, sys
 
-tz, workspace, qmd, ops_channel, ops_account, ops_target = sys.argv[1:]
+tz, workspace, qmd, ops_channel, ops_account, ops_target, retrieval_model = sys.argv[1:]
 raw = os.environ.get("LIST_JOBS_JSON", "").strip() or '{"jobs":[]}'
 try:
     data = json.loads(raw)
@@ -295,6 +299,7 @@ result = {
         "accountId": ops_account,
         "target": ops_target if ops_target else None,
     },
+    "retrievalModel": retrieval_model,
     "stateFiles": {
         "processedSessions": os.path.isfile(os.path.join(workspace, "memory/state/processed-sessions.json")),
         "watchdogState": os.path.isfile(os.path.join(workspace, "memory/state/memory-watchdog-state.json")),

@@ -23,7 +23,21 @@ This repository ships prompt templates through `scripts/setup.sh`.
 
 ## Watchdog prompt (intent)
 
-- Check `memory-sync-daily` and `memory-weekly-tidy`
+- Check `memory-sync-daily`, `memory-weekly-tidy`, `memory-retrieval-watchdog-v1`, and `memory-qmd-nightly-maintain`
 - Detect stale/error/disabled states
 - Require two consecutive anomalies before alerting
 - Include `last3` snapshots in alert payload
+
+## Retrieval watchdog prompt (intent)
+
+- Run `python3 scripts/memory_retrieval_watchdog.py --qmd-path <absolute-qmd-path>`
+- Use a stable explicit model for the cron job (recommended: `glm5`)
+- Healthy or first anomaly: `ANNOUNCE_SKIP`
+- Confirmed anomaly only: send routed alert if `OPS_TARGET` is configured
+
+## Nightly QMD maintenance prompt (intent)
+
+- Run `qmd update`
+- Parse `qmd status` pending backlog
+- Run `qmd embed` only when pending backlog exceeds threshold
+- On failure, alert via configured route; `OPS_TARGET` may be direct chat / group / supergroup

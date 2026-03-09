@@ -19,6 +19,8 @@ Expected jobs:
 openclaw cron run <job-id>
 ```
 
+If `memory-retrieval-watchdog-v1` is timing out unexpectedly, first verify which model it is using. For lightweight health checks, prefer a stable explicit model (recommended: `glm5`) instead of relying on long fallback chains.
+
 ## MVP baseline bootstrap (recommended)
 
 The one-command installer already bootstraps baseline files into workspace:
@@ -62,6 +64,8 @@ python3 ~/.openclaw/workspace/scripts/memory_conflict_check.py
 python3 ~/.openclaw/workspace/scripts/memory_retrieval_watchdog.py --qmd-path "$(command -v qmd)"
 ```
 
+> In cron / isolated environments, prefer an absolute `qmd` path instead of `$(command -v qmd)` copied from an interactive shell.
+
 ## Common failures
 
 1. Gateway timeout while run is actually in progress
@@ -75,4 +79,8 @@ python3 ~/.openclaw/workspace/scripts/memory_retrieval_watchdog.py --qmd-path "$
    - Verify selected profile is minimal (`memory_context_pack.py --json`)
 5. Retrieval quality dropped
    - Check `memory-retrieval-watchdog-v1` state and `pending_embeddings`
+   - Verify the watchdog model is explicit and stable (recommended: `glm5`)
    - Run `qmd update`; only embed when backlog threshold is exceeded
+6. Alert delivery works in one chat but not another
+   - Re-check `OPS_TARGET` type (direct chat / group / supergroup)
+   - Telegram group upgrades may change chat id; probe the route after install
