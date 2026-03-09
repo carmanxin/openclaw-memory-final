@@ -16,8 +16,9 @@ Thanks for contributing to `openclaw-memory-final`.
    ```bash
    bash scripts/validate.sh
    ```
-3. Keep changes minimal and well documented.
-4. Open a PR with:
+3. Do not hardcode user-specific local paths in runtime code or CI (for example `/home/alice/...`, `/Users/bob/...`, `/root/...`). Prefer `OPENCLAW_WORKSPACE`, `WORKSPACE_DIR`, `$HOME`, `Path.home()`, or explicit config/env injection.
+4. Keep changes minimal and well documented.
+5. Open a PR with:
    - problem statement
    - what changed
    - risk/rollback notes

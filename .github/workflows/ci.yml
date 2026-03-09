@@ -13,5 +13,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq shellcheck
       - name: Shellcheck
         run: shellcheck scripts/*.sh
+      - name: Hardcoded path guard
+        run: python3 scripts/check_hardcoded_paths.py
       - name: Validate
         run: bash scripts/validate.sh
