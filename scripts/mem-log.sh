@@ -8,7 +8,7 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-workspace="${WORKSPACE_DIR:-$HOME/.openclaw/workspace}"
+workspace="${WORKSPACE_DIR:-${OPENCLAW_WORKSPACE:-$HOME/.openclaw/workspace}}"
 day="$(date +%F)"
 ts="$(date '+%Y-%m-%d %H:%M:%S %z')"
 file="$workspace/memory/$day.md"

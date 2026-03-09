@@ -3,7 +3,7 @@ set -euo pipefail
 
 export TZ="${TZ:-Asia/Shanghai}"
 
-workspace="${WORKSPACE_DIR:-$HOME/.openclaw/workspace}"
+workspace="${WORKSPACE_DIR:-${OPENCLAW_WORKSPACE:-$HOME/.openclaw/workspace}}"
 day="$(date +%F)"
 dst="$workspace/memory/tasks/$day.md"
 

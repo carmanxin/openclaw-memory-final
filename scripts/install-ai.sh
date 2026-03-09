@@ -10,6 +10,7 @@ OPS_TARGET=""
 RETRIEVAL_MODEL="glm5"
 CMD_TIMEOUT_SEC="60"
 FORCE_RECREATE=0
+REFRESH_SCRIPTS=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -31,6 +32,8 @@ while [[ $# -gt 0 ]]; do
       CMD_TIMEOUT_SEC="$2"; shift 2 ;;
     --force-recreate)
       FORCE_RECREATE=1; shift ;;
+    --refresh-scripts)
+      REFRESH_SCRIPTS=1; shift ;;
     *)
       echo "AI_INSTALL_ERROR unknown_arg=$1"
       exit 2 ;;
@@ -60,6 +63,9 @@ if [[ -n "$OPS_TARGET" ]]; then
 fi
 if [[ "$FORCE_RECREATE" -eq 1 ]]; then
   ARGS+=(--force-recreate)
+fi
+if [[ "$REFRESH_SCRIPTS" -eq 1 ]]; then
+  ARGS+=(--refresh-scripts)
 fi
 
 if ! OUT="$(bash "$(dirname "$0")/setup.sh" "${ARGS[@]}" 2>&1)"; then
