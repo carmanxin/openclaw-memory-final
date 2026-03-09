@@ -33,7 +33,11 @@ openclaw doctor --non-interactive
      ```
    - If running in isolated/cron environment, prefer absolute path (example):
      ```bash
-     bash scripts/setup.sh --qmd-path /home/jiumu/.nvm/versions/node/v22.22.0/bin/qmd
+     bash scripts/setup.sh --qmd-path "$(command -v qmd)"
+     ```
+   - If `command -v qmd` is empty, first locate the binary explicitly:
+     ```bash
+     which qmd
      ```
 
 ## 3) Recovery

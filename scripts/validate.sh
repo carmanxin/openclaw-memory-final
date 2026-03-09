@@ -15,8 +15,8 @@ python3 -m py_compile scripts/memory_conflict_check.py
 python3 -m py_compile scripts/memory_retrieval_watchdog.py
 
 # guard against runtime hardcoded workspace paths
-if grep -RIn "/home/jiumu" scripts/*.py >/dev/null; then
-  echo "❌ runtime scripts still contain hardcoded /home/jiumu path" >&2
+if grep -RInE '/home/[^/]+/\.openclaw/workspace|/Users/[^/]+/\.openclaw/workspace' scripts/*.py >/dev/null; then
+  echo "❌ runtime scripts still contain hardcoded user workspace paths" >&2
   exit 1
 fi
 
