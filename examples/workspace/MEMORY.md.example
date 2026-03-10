@@ -1,0 +1,62 @@
+# Long-Term Memory
+
+> 仅保留“缺了会犯错”的长期信息；事件流水放 daily/weekly。
+> Hard limit: <=80 lines / <=5KB.
+
+## User Preferences
+
+- 中文沟通；技术术语保留英文。
+- 回答先结论后细节；命令行优先，给可直接执行命令。
+- 默认直接执行，少过程描述；复杂任务做里程碑汇报（已完成/进行中/下一步）。
+- 长任务默认异步：先 ACK，再执行，完成后汇总；避免主会话阻塞超时。
+- 遇到权限问题：先尝试 elevated，失败再回报。
+- 主 agent 是“总管理”；子 agent 按“目标/边界/验收/复盘”培养，避免脚本式逐条指令。
+- 子任务默认模型固定 `codex`（除非用户明确指定其他模型）。
+- phoneDriver 仓库约定：README 与 commit message 默认中文（术语保留英文）。
+- 新策略先发审阅，用户确认后再启动回测。
+- 用户明确：不要“硬优化”（不做为优化而优化的改动）；仅在有明确收益或必要性证据时才优化。
+
+## Environment Baseline
+
+- OpenClaw 运行主机：`<REDACTED_IP>`（Ubuntu）。
+- 模型网关：CPA `<REDACTED_IP>:8317`；默认模型 `cpa/gpt-5.2`（alias `gpt52`）；`colin/gpt-5.4` 仍可用（alias `gpt5.4`）。
+- 机器人分工：main（日常）、ops（运维）、btc（交易）、quant（RD）、zixungou（网站运维）。
+- PhoneDriver 生产路径：远端 Qwen Plus（DashScope OpenAI 兼容）+ 无线 ADB + Web UI。
+- UFW 防火墙已启用：22/18789/5432/7860/19910 仅允许 `<REDACTED_IP>/24`。
+
+## Core Operating Rules
+
+- 全局执行标准：AEGIS-1（Agent 真执行治理标准）已定名；标准更新需同步 `https://github.com/codesfly/aegis`。
+- Debug-First：禁止静默失败/假成功；优先修根因。
+- Fallback 仅在必要场景启用，且需显式、可关闭、文档可见、经用户确认。
+- 破坏性操作（rm/drop/reset/force push）必须先确认。
+
+## Stable Decisions (Keep)
+
+- OPS 自愈巡检依赖 paired node；当 `nodes=[]` 时按 `environment_uncertain + ANNOUNCE_SKIP`，避免误报。
+- 交易/运维汇总默认发 ops 群 `-<REDACTED_ID>`（除非任务明确改路由）。
+- Freqtrade 原生 Telegram 通知当前走私聊 `<REDACTED_ID>`（`@<REDACTED_BOT>`）。
+- QMD 在 cron/隔离环境必须用绝对路径：
+  - `/home/<USER>/.nvm/versions/node/v22.22.0/bin/qmd update`
+  - `/home/<USER>/.nvm/versions/node/v22.22.0/bin/qmd embed`
+- 长任务超时治理：不改全局 timeout；采用“即时 ACK + 异步执行 + 完成通知”。
+- `memory-retrieval-watchdog-v1` 运行模型固定为 `glm5`，避免 `codex429 -> dsr502` fallback 链拖慢导致超时。
+- `memory-qmd-nightly-maintain` 失败告警当前路由到 Telegram 私聊 `<REDACTED_ID>`（`channel=telegram, accountId=ops`）。
+
+## Current Project State (Durable)
+
+- Freqtrade + RD-Agent 持续优化链路已上线（候选快筛→深跑→门禁校验→通知）。
+- RD 通知路由已改为 quant 私聊 `<REDACTED_ID>`（原策略群已删除）。
+- RD 模型分离开关已落地：`RD_SCOUT_CHAT_MODEL` / `RD_ITERATE_CHAT_MODEL`（当前 scout=grok, iterate=codex）。
+- PhoneDriver 已打通真机链路（无线 ADB），并修复远端 Qwen `reasoning_content` 工具调用解析与连续任务提前 terminate 问题。
+
+## Constraints / Known Boundaries
+
+- quant 会话当前无法直接访问 `/home/<USER>/apps/rd-agent-freqtrade-integration`，需改派可访问上下文执行。
+- ops 巡检在无 node 配对时只能做不确定性早退；恢复实检需先补 node pairing。
+
+## Repos of Record
+
+- 记忆架构模板：`https://github.com/codesfly/openclaw-memory-final`
+- AEGIS 标准仓库：`https://github.com/codesfly/aegis`
+- 安全文档仓库：`https://github.com/codesfly/openclaw-security-doc`

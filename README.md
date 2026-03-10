@@ -217,6 +217,14 @@ Notes:
 3. Pull only the needed snippet (`memory_get`)
 4. Drill into raw sub-agent session history only when necessary
 
+## Workspace templates (sanitized)
+
+This repo also ships a **sanitized** set of real-world workspace files (persona + operating rules) under:
+
+- `examples/workspace/`
+
+See: `examples/workspace/README.md`.
+
 ## Repository Layout
 
 ```text
