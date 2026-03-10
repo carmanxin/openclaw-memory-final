@@ -1,0 +1,45 @@
+# TOOLS.md — 环境备注
+
+## 服务器
+
+| 名称 | IP | 用户 | 用途 |
+|------|----|------|------|
+| 本机 (OpenClaw) | <REDACTED_IP> | <USER> | OpenClaw Gateway 运行主机 |
+| CPA 模型网关 | <REDACTED_IP>:8317 | - | 模型 API 代理（OpenAI 兼容格式） |
+
+## 模型说明
+
+- 主模型: `cpa/gpt-5.2` (推理型，支持图片)
+- Fallback 顺序: gpt-5.3-codex → deepseek-v3.2-reasoner → glm-5（见 openclaw.json agents.defaults.model）
+- 推理型模型: gpt-5.3-codex, deepseek-v3.2-reasoner, kimi-k2-thinking, kimi-k2.5, glm-5
+- 外部模型: `mr/zai-org/GLM-5-FP8` (Modal Research)
+
+## Telegram Bot 分工
+
+| 账号 | Bot | 用途 |
+|------|-----|------|
+| main | @<REDACTED_BOT> (<BOT_MAIN_NAME>) | 日常助手，通用问答 |
+| ops | @<REDACTED_BOT> (<BOT_OPS_NAME>) | 服务器监控、运维任务 |
+| btc | @<REDACTED_BOT> (<BOT_BTC_NAME>) | 加密货币相关 |
+
+## 常用路径
+
+- OpenClaw 工作区: `~/.openclaw/workspace`
+- OpenClaw 配置: `~/.openclaw/openclaw.json`
+- 日志: `/tmp/openclaw/openclaw-YYYY-MM-DD.log`
+- Node.js: `~/.nvm/versions/node/v22.22.0/bin/node`
+
+## Skills 打包与索引
+
+- 重打包全部已分发 skills：`python3 ~/.openclaw/workspace/scripts/package_skills.py`
+- 生成产物：
+  - 根目录 `skills/*.skill`
+  - 分发目录 `skills/dist/*.skill`
+  - 总包 `skills/dist/openclaw-skills-pack-vYYYY-MM-DD.tar.gz`
+  - 索引 `skills/index/skills-index.json` 与 `skills/index/skills-index.md`
+- 默认排除：`skills/openclaw-skill-template/`（仅内部模板，不参与分发，避免干扰其他 agent 触发）
+- 打包要求：不改已有 skill 名称与 description 的核心触发语义；重复执行应保持索引稳定、无无意义漂移。
+
+---
+
+_添加任何有助于你工作的环境信息。这是你的备忘录。_

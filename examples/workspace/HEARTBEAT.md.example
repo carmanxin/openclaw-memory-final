@@ -1,0 +1,13 @@
+# HEARTBEAT.md — 心跳任务
+
+## 定期检查（轮流执行，不必每次全做）
+
+- [ ] 检查本机磁盘和内存使用率，异常时通知
+- [ ] 检查 OpenClaw Gateway 运行状态（用 `systemctl --user is-active openclaw-gateway.service` 或 `openclaw status`，不要用系统级 `systemctl` 误判）
+- [ ] 查看 memory/ 目录，整理过期的每日日志到 MEMORY.md
+
+## 规则
+
+- 深夜 (23:00-08:00 CST) 除非异常否则 HEARTBEAT_OK
+- 如果没有异常且无待办，回复 HEARTBEAT_OK
+- 使用 memory/heartbeat-state.json 追踪上次检查时间，避免重复检查
