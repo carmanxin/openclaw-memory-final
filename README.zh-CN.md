@@ -149,6 +149,7 @@ bash scripts/install-ai.sh --tz Asia/Shanghai
 > - `scripts/memory_context_pack.py`
 > - `scripts/memory_conflict_check.py`
 > - `scripts/memory_retrieval_watchdog.py`
+> - `HEARTBEAT.md`（由模板自动初始化，用于 heartbeat 定期巡检）
 
 ```bash
 openclaw gateway restart
@@ -217,9 +218,9 @@ openclaw skills list --eligible
 ## 更新日志 / Release Notes
 
 - 完整日志：[`CHANGELOG.md`](CHANGELOG.md)
-- 最新发布：`待发布 v0.4.1`
+- 最新发布：`待发布 v0.4.2`
 
-### 即将发布的 v0.4.1 重点
+### v0.4.2 重点
 
 - 为 `memory-retrieval-watchdog-v1` 增加显式 `--retrieval-model` 支持（默认 `glm5`）
 - 明确 `OPS_TARGET` 支持私聊 / 群 / supergroup，且安装后应做路由探测

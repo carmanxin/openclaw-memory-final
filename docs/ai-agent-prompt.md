@@ -27,13 +27,13 @@ https://github.com/codesfly/openclaw-memory-final
    - 在 AGENTS.md 的 agent 配置里加入：
      ```yaml
      heartbeat:
-       every: '30m'
+       every: '5m'
      ```
-   - 将 `examples/HEARTBEAT.md.template` 复制到 `~/.openclaw/workspace/HEARTBEAT.md`
+   - 确认工作区根目录存在 `HEARTBEAT.md`（`setup.sh` 会自动从 `examples/HEARTBEAT.md.template` 创建；如需自定义再覆盖）
 7) 若存在子 agent 任务，补充生成结果卡：`~/.openclaw/workspace/memory/tasks/YYYY-MM-DD.md`
    - 仅写结论，不粘贴完整执行日志
    - 字段至少包含：任务目标、边界、验收、关键动作、产物路径、最终状态、下一步
-7) 最终回报格式：
+8) 最终回报格式：
    - Result: OK/FAIL
    - Jobs: 名称 -> id
    - Next Runs:

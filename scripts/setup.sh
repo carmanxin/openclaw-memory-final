@@ -14,6 +14,27 @@ CMD_TIMEOUT_SEC="${OPENCLAW_CMD_TIMEOUT_SEC:-25}"
 SKIP_HEALTHCHECK=0
 PRINT_JSON=0
 
+usage() {
+  cat <<'EOF'
+Usage: bash scripts/setup.sh [options]
+
+Options:
+  --tz <tz>                Timezone (default: Asia/Shanghai)
+  --workspace <path>       Target OpenClaw workspace (default: ~/.openclaw/workspace)
+  --qmd-path <path>        Absolute path to qmd binary
+  --retrieval-model <m>    Model used by memory-retrieval-watchdog-v1 (default: glm5)
+  --command-timeout <s>    Timeout for openclaw CLI calls (default: 25)
+  --ops-channel <name>     Ops alert channel (default: telegram)
+  --ops-account <name>     Ops bot accountId (default: ops)
+  --ops-target <id>        Ops alert target (direct chat/group/supergroup id)
+  --force-recreate         Recreate existing memory-* cron jobs
+  --refresh-scripts        Overwrite workspace helper scripts from repo
+  --skip-healthcheck       Skip gateway pre/post healthcheck (openclaw status)
+  --print-json             Print machine-readable JSON report and exit
+  -h, --help               Show this help
+EOF
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tz)
@@ -40,8 +61,11 @@ while [[ $# -gt 0 ]]; do
       SKIP_HEALTHCHECK=1; shift ;;
     --print-json)
       PRINT_JSON=1; shift ;;
+    -h|--help)
+      usage; exit 0 ;;
     *)
       echo "Unknown argument: $1" >&2
+      usage
       exit 1 ;;
   esac
 done

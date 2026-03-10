@@ -12,6 +12,25 @@ CMD_TIMEOUT_SEC="60"
 FORCE_RECREATE=0
 REFRESH_SCRIPTS=0
 
+usage() {
+  cat <<'EOF'
+Usage: bash scripts/install-ai.sh [options]
+
+Options:
+  --tz <tz>              Timezone (default: Asia/Shanghai)
+  --workspace <path>     Target OpenClaw workspace (default: ~/.openclaw/workspace)
+  --qmd-path <path>      Absolute path to qmd binary (recommended for cron/isolated)
+  --retrieval-model <m>  Model used by memory-retrieval-watchdog-v1 (default: glm5)
+  --command-timeout <s>  Timeout for openclaw CLI calls inside setup (default: 60)
+  --ops-channel <name>   Ops alert channel (default: telegram)
+  --ops-account <name>   Ops bot accountId (default: ops)
+  --ops-target <id>      Ops alert target (direct chat/group/supergroup id)
+  --force-recreate       Recreate existing memory-* cron jobs
+  --refresh-scripts      Overwrite workspace helper scripts from repo
+  -h, --help             Show this help
+EOF
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tz)
@@ -34,8 +53,11 @@ while [[ $# -gt 0 ]]; do
       FORCE_RECREATE=1; shift ;;
     --refresh-scripts)
       REFRESH_SCRIPTS=1; shift ;;
+    -h|--help)
+      usage; exit 0 ;;
     *)
       echo "AI_INSTALL_ERROR unknown_arg=$1"
+      usage
       exit 2 ;;
   esac
 done

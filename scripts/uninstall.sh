@@ -3,12 +3,25 @@ set -euo pipefail
 
 CMD_TIMEOUT_SEC="${OPENCLAW_CMD_TIMEOUT_SEC:-25}"
 
+usage() {
+  cat <<'EOF'
+Usage: bash scripts/uninstall.sh [options]
+
+Options:
+  --command-timeout <s>  Timeout for openclaw CLI calls (default: 25)
+  -h, --help             Show this help
+EOF
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --command-timeout)
       CMD_TIMEOUT_SEC="$2"; shift 2 ;;
+    -h|--help)
+      usage; exit 0 ;;
     *)
       echo "Unknown argument: $1" >&2
+      usage
       exit 1 ;;
   esac
 done
