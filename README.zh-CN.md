@@ -218,7 +218,7 @@ openclaw skills list --eligible
 ## 更新日志 / Release Notes
 
 - 完整日志：[`CHANGELOG.md`](CHANGELOG.md)
-- 最新发布：`待发布 v0.4.2`
+- 最新发布：`v0.4.2`
 
 ### v0.4.2 重点
 
