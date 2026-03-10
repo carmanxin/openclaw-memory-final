@@ -107,6 +107,9 @@ fi
 if [[ ! -f "$WORKSPACE/memory/context-profiles.json" ]]; then
   cp "$REPO_ROOT/examples/memory/context-profiles.json" "$WORKSPACE/memory/context-profiles.json"
 fi
+if [[ ! -f "$WORKSPACE/HEARTBEAT.md" ]]; then
+  cp "$REPO_ROOT/examples/HEARTBEAT.md.template" "$WORKSPACE/HEARTBEAT.md"
+fi
 
 # Helper scripts
 for f in mem-log.sh memory-reflect.sh \

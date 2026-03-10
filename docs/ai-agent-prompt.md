@@ -22,7 +22,15 @@ https://github.com/codesfly/openclaw-memory-final
    - 检查 `~/.openclaw/workspace/memory/state/memory-watchdog-state.json`
    - 检查 `~/.openclaw/workspace/memory/context-profiles.json`
    - 执行 `python3 ~/.openclaw/workspace/scripts/memory_context_budget_guard.py --profile main`
-6) 若存在子 agent 任务，补充生成结果卡：`~/.openclaw/workspace/memory/tasks/YYYY-MM-DD.md`
+6) 合并心跳配置（重要，否则重启后无心跳保活）：
+   - 将 `examples/AGENTS-memory-section.md` 中的 "Heartbeat (定期巡检)" 章节合并到 `~/.openclaw/workspace/AGENTS.md`
+   - 在 AGENTS.md 的 agent 配置里加入：
+     ```yaml
+     heartbeat:
+       every: '30m'
+     ```
+   - 将 `examples/HEARTBEAT.md.template` 复制到 `~/.openclaw/workspace/HEARTBEAT.md`
+7) 若存在子 agent 任务，补充生成结果卡：`~/.openclaw/workspace/memory/tasks/YYYY-MM-DD.md`
    - 仅写结论，不粘贴完整执行日志
    - 字段至少包含：任务目标、边界、验收、关键动作、产物路径、最终状态、下一步
 7) 最终回报格式：

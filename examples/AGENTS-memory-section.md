@@ -55,6 +55,25 @@ You wake up fresh each session. Files are your memory.
 When key decisions or durable user preferences appear, append to today's daily memory immediately.
 Do not rely on cron alone.
 
+### Heartbeat (定期巡检)
+
+OpenClaw 支持心跳机制，定期唤醒主会话执行巡检任务。要启用心跳：
+
+1. 在 `AGENTS.md` 的 agent 配置里加入：
+
+```yaml
+heartbeat:
+  every: '30m'
+```
+
+2. 在工作区根目录创建 `HEARTBEAT.md`，写入心跳时要执行的检查任务。
+
+3. 心跳触发时，agent 会读取 `HEARTBEAT.md` 并执行其中的任务。
+
+4. 如果没有异常且无待办，回复 `HEARTBEAT_OK`。
+
+**注意**：本仓库的 cron jobs（daily sync / weekly tidy / watchdog 等）是独立于心跳机制的定时任务；心跳是额外的定期唤醒机制，用于主动巡检和保活。
+
 ### Safety
 
 Never write tokens/secrets/private identifiers into memory files.
