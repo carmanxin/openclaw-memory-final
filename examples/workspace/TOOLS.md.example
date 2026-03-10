@@ -4,7 +4,7 @@
 
 | 名称 | IP | 用户 | 用途 |
 |------|----|------|------|
-| 本机 (OpenClaw) | <REDACTED_IP> | jiumu | OpenClaw Gateway 运行主机 |
+| 本机 (OpenClaw) | <REDACTED_IP> | <USER> | OpenClaw Gateway 运行主机 |
 | CPA 模型网关 | <REDACTED_IP>:8317 | - | 模型 API 代理（OpenAI 兼容格式） |
 
 ## 模型说明
@@ -18,9 +18,9 @@
 
 | 账号 | Bot | 用途 |
 |------|-----|------|
-| main | @<REDACTED_BOT> (九目OS) | 日常助手，通用问答 |
-| ops | @<REDACTED_BOT> (九目运维) | 服务器监控、运维任务 |
-| btc | @<REDACTED_BOT> (九目BTC) | 加密货币相关 |
+| main | @<REDACTED_BOT> (<BOT_MAIN_NAME>) | 日常助手，通用问答 |
+| ops | @<REDACTED_BOT> (<BOT_OPS_NAME>) | 服务器监控、运维任务 |
+| btc | @<REDACTED_BOT> (<BOT_BTC_NAME>) | 加密货币相关 |
 
 ## 常用路径
 

@@ -1,8 +1,8 @@
 # USER.md — 用户信息
 
-- **Name:** jiumu
-- **称呼:** 九目
-- **Timezone:** Asia/Shanghai (UTC+8)
+- **Name:** <USER>
+- **称呼:** <ASSISTANT_NAME>
+- **Timezone:** <YOUR_TZ> (e.g. Asia/Shanghai, UTC+8)
 - **语言:** 中文为主，技术术语保留英文
 
 ## 背景

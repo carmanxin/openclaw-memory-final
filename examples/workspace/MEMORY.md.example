@@ -22,7 +22,7 @@
 - 模型网关：CPA `<REDACTED_IP>:8317`；默认模型 `cpa/gpt-5.2`（alias `gpt52`）；`colin/gpt-5.4` 仍可用（alias `gpt5.4`）。
 - 机器人分工：main（日常）、ops（运维）、btc（交易）、quant（RD）、zixungou（网站运维）。
 - PhoneDriver 生产路径：远端 Qwen Plus（DashScope OpenAI 兼容）+ 无线 ADB + Web UI。
-- UFW 防火墙已启用：22/18789/5432/7860/19910 仅允许 `<REDACTED_IP>/24`。
+- UFW 防火墙已启用：<YOUR_UFW_RULES>（示例：仅允许内网段访问关键端口）。
 
 ## Core Operating Rules
 
@@ -34,14 +34,14 @@
 ## Stable Decisions (Keep)
 
 - OPS 自愈巡检依赖 paired node；当 `nodes=[]` 时按 `environment_uncertain + ANNOUNCE_SKIP`，避免误报。
-- 交易/运维汇总默认发 ops 群 `-<REDACTED_ID>`（除非任务明确改路由）。
-- Freqtrade 原生 Telegram 通知当前走私聊 `<REDACTED_ID>`（`@<REDACTED_BOT>`）。
+- 交易/运维汇总默认发 ops 群 `<REDACTED_GROUP_ID>`（除非任务明确改路由）。
+- Freqtrade 原生 Telegram 通知当前走私聊 `<REDACTED_CHAT_ID>`（`@<REDACTED_BOT>`）。
 - QMD 在 cron/隔离环境必须用绝对路径：
   - `/home/<USER>/.nvm/versions/node/v22.22.0/bin/qmd update`
   - `/home/<USER>/.nvm/versions/node/v22.22.0/bin/qmd embed`
 - 长任务超时治理：不改全局 timeout；采用“即时 ACK + 异步执行 + 完成通知”。
 - `memory-retrieval-watchdog-v1` 运行模型固定为 `glm5`，避免 `codex429 -> dsr502` fallback 链拖慢导致超时。
-- `memory-qmd-nightly-maintain` 失败告警当前路由到 Telegram 私聊 `<REDACTED_ID>`（`channel=telegram, accountId=ops`）。
+- `memory-qmd-nightly-maintain` 失败告警当前路由到 Telegram 私聊 `<REDACTED_CHAT_ID>`（`channel=telegram, accountId=ops`）。
 
 ## Current Project State (Durable)
 
