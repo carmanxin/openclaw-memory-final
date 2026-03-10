@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-03-10
+
+### Fixed
+- Added heartbeat bootstrap assets for one-link installs: `examples/HEARTBEAT.md.template` and automatic `HEARTBEAT.md` creation in `scripts/setup.sh`.
+- Documented heartbeat merge steps in `docs/ai-agent-prompt.md` so restart recovery no longer depends on users discovering heartbeat config manually.
+
+### Changed
+- Recommended default heartbeat cadence in bootstrap docs/examples is now `5m` instead of `30m` for faster post-restart wake-up and liveness checks.
+- README (EN/ZH) now mentions the heartbeat template as part of the bootstrapped baseline and marks `v0.4.2` as the next release.
+
+
 ## [0.4.1] - 2026-03-09
 
 ### Added

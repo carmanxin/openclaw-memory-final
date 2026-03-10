@@ -145,6 +145,7 @@ Then:
 > - `scripts/memory_context_pack.py`
 > - `scripts/memory_conflict_check.py`
 > - `scripts/memory_retrieval_watchdog.py`
+> - `HEARTBEAT.md` (from template, for heartbeat-driven periodic checks)
 
 ```bash
 openclaw gateway restart
@@ -233,15 +234,13 @@ This project follows **Semantic Versioning**.
 ## Changelog / Release Notes
 
 - Full changelog: [`CHANGELOG.md`](CHANGELOG.md)
-- Latest release: `pending v0.4.1`
+- Latest release: `v0.4.2`
 
-### Upcoming v0.4.1 highlights
+### v0.4.2 highlights
 
-- Added explicit `--retrieval-model` support (default `glm5`) for `memory-retrieval-watchdog-v1`
-- Clarified `OPS_TARGET` can be direct chat / group / supergroup and should be verified after install
-- Strengthened guidance to pass absolute `--qmd-path` in cron/isolated environments
-- Clarified recommended retrieval order: `memory/tasks` -> `memory_search` -> `memory_get`
-- Updated install/docs/runbook text for the current OpenClaw runtime behavior
+- Added heartbeat bootstrap assets for one-link installs (`examples/HEARTBEAT.md.template` + `scripts/setup.sh` auto-create `HEARTBEAT.md`).
+- Changed recommended heartbeat cadence to `5m` (from `30m`) in bootstrap docs for faster post-restart wake-up checks.
+- Clarified AI bootstrap instructions to merge heartbeat config into `AGENTS.md`.
 
 ## License
 
